@@ -3,15 +3,13 @@
 [![Build and Release](https://github.com/nichbar/Ulmaridae/actions/workflows/build-release.yml/badge.svg)](https://github.com/nichbar/Ulmaridae/actions/workflows/build-release.yml)
 [![CI](https://github.com/nichbar/Ulmaridae/actions/workflows/ci.yml/badge.svg)](https://github.com/nichbar/Ulmaridae/actions/workflows/ci.yml)
 
-An Android wrapper application for [Nezha](https://github.com/nezhahq/nezha) monitoring agent, designed to run the agent on Android devices even without root privileges.
+Ulmaridae is an Android wrapper application for the [Nezha](https://github.com/nezhahq/nezha) monitoring agent, designed to run the agent on Android devices, even without root privileges.
 
-## Features
+The original [Nezha Agent](https://github.com/nezhahq/agent) is built for standard Linux environments, and some of its features will not work on Android, even if root privileges are granted. This project aims to make it work on Android with ease.
 
-- ✅ **Simple UI**: Clean Material Design interface with toggle controls
-- ✅ **Background Service**: Runs Nezha agent as a persistent foreground service
-- ✅ **Root Support**: Automatically detects and uses root privileges when available
-- ✅ **Battery Optimization**: Requests exemption from battery optimization
-- ✅ **Network Permissions**: Handles all required permissions automatically
+This project uses a modified version of the [Nezha Agent](https://github.com/nichbar/agent) to work better on Android.
+
+All binaries are built from source using GitHub Actions.
 
 ## Installation & Configuration
 
