@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "nzwrapper"
+rootProject.name = "Ulmaridae"
 include(":app")
  

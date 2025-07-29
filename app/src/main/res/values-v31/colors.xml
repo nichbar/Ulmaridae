@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dynamic colors for Android 12+ (API 31+) -->
+    <!-- These will automatically adapt to the user's wallpaper colors -->
+    
+    <!-- Primary colors from system palette -->
+    <color name="md_theme_light_primary">@android:color/system_accent1_600</color>
+    <color name="md_theme_light_onPrimary">@android:color/system_accent1_0</color>
+    <color name="md_theme_light_primaryContainer">@android:color/system_accent1_100</color>
+    <color name="md_theme_light_onPrimaryContainer">@android:color/system_accent1_900</color>
+    
+    <!-- Secondary colors from system palette -->
+    <color name="md_theme_light_secondary">@android:color/system_accent2_600</color>
+    <color name="md_theme_light_onSecondary">@android:color/system_accent2_0</color>
+    <color name="md_theme_light_secondaryContainer">@android:color/system_accent2_100</color>
+    <color name="md_theme_light_onSecondaryContainer">@android:color/system_accent2_900</color>
+    
+    <!-- Tertiary colors from system palette -->
+    <color name="md_theme_light_tertiary">@android:color/system_accent3_600</color>
+    <color name="md_theme_light_onTertiary">@android:color/system_accent3_0</color>
+    <color name="md_theme_light_tertiaryContainer">@android:color/system_accent3_100</color>
+    <color name="md_theme_light_onTertiaryContainer">@android:color/system_accent3_900</color>
+    
+    <!-- Surface colors from system neutral palette -->
+    <color name="md_theme_light_surface">@android:color/system_neutral1_10</color>
+    <color name="md_theme_light_onSurface">@android:color/system_neutral1_900</color>
+    <color name="md_theme_light_surfaceVariant">@android:color/system_neutral2_100</color>
+    <color name="md_theme_light_onSurfaceVariant">@android:color/system_neutral2_700</color>
+    <color name="md_theme_light_surfaceContainer">@android:color/system_neutral1_50</color>
+    <color name="md_theme_light_surfaceContainerLowest">@android:color/system_neutral1_0</color>
+    <color name="md_theme_light_surfaceContainerLow">@android:color/system_neutral1_50</color>
+    <color name="md_theme_light_surfaceContainerHigh">@android:color/system_neutral1_100</color>
+    <color name="md_theme_light_surfaceContainerHighest">@android:color/system_neutral1_200</color>
+    
+    <!-- Background colors -->
+    <color name="md_theme_light_background">@android:color/system_neutral1_10</color>
+    <color name="md_theme_light_onBackground">@android:color/system_neutral1_900</color>
+    
+    <!-- Error colors -->
+    <color name="md_theme_light_error">@android:color/system_error_600</color>
+    <color name="md_theme_light_onError">@android:color/system_error_0</color>
+    <color name="md_theme_light_errorContainer">@android:color/system_error_100</color>
+    <color name="md_theme_light_onErrorContainer">@android:color/system_error_900</color>
+    
+    <!-- Outline colors -->
+    <color name="md_theme_light_outline">@android:color/system_neutral2_500</color>
+    <color name="md_theme_light_outlineVariant">@android:color/system_neutral2_200</color>
+    
+    <!-- Scrim -->
+    <color name="md_theme_light_scrim">@android:color/system_neutral1_0</color>
+</resources>

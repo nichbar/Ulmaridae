@@ -1,0 +1,120 @@
+<resources>
+    <string name="app_name">Ulmaridae</string>
+    
+    <!-- Main Activity -->
+    <string name="agent_running">Agent 运行中</string>
+    <string name="agent_stopped">Agent 已停止</string>
+    <string name="root_available">可用</string>
+    <string name="root_not_available">不可用</string>
+    <string name="not_configured">未配置</string>
+    <string name="server_format">服务器: %s</string>
+    <string name="logs_coming_soon">日志功能即将推出</string>
+    
+    <!-- Service Control Button States -->
+    <string name="start_agent">启动 Agent</string>
+    <string name="stop_agent">停止 Agent</string>
+    <string name="starting_agent">启动中…</string>
+    <string name="stopping_agent">停止中…</string>
+    <string name="downloading">下载中…</string>
+    <string name="configuring">配置中…</string>
+    
+    <!-- Configuration Dialog -->
+    <string name="configure_nezha_agent">配置哪吒 Agent</string>
+    <string name="configuration_dialog_description">输入您的哪吒服务器 URL 和 Agent 密钥。UUID 是可选的，用于标识设备。这些信息可以在您的哪吒面板中找到。</string>
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="configuration_saved">配置已保存</string>
+    <string name="fill_required_fields">请填写必填字段</string>
+    <string name="error_showing_config_dialog">显示配置对话框时出错: %s</string>
+    
+    <!-- Permissions -->
+    <string name="permissions_required">需要权限</string>
+    <string name="permissions_message">此应用需要某些权限才能正常运行。您可以在应用设置中授予权限，或以有限功能继续使用。</string>
+    <string name="settings">设置</string>
+    <string name="continue_anyway">仍然继续</string>
+    <string name="retry">重试</string>
+    
+    <!-- Wake Lock -->
+    <string name="wake_lock_enabled">唤醒锁已启用</string>
+    <string name="wake_lock_info">唤醒锁可防止设备CPU进入睡眠状态，确保持续监控。\n\n优点:\n• 防止监控中断\n• 确保实时数据报告\n• 保持稳定连接\n\n注意：这可能会增加电池消耗。唤醒锁仅在监控服务运行时激活。</string>
+    <string name="got_it">知道了</string>
+    
+    <!-- Service Notifications -->
+    <string name="nezha_agent">哪吒 Agent</string>
+    <string name="nezha_agent_running">哪吒 Agent 运行中</string>
+    <string name="nezha_agent_running_root">哪吒 Agent 运行中 (root)</string>
+    <string name="nezha_agent_service">哪吒 Agent 服务</string>
+    <string name="nezha_agent_service_description">哪吒监控 Agent 后台服务</string>
+    <string name="stop">停止</string>
+    <string name="downloading_agent">正在下载哪吒 Agent 二进制文件...</string>
+    <string name="failed_download_agent">下载 Agent 二进制文件失败</string>
+    <string name="agent_downloaded_starting">Agent 二进制文件已下载，正在启动...</string>
+    <string name="agent_not_configured">Agent 未配置</string>
+    <string name="failed_create_config">创建配置文件失败</string>
+    <string name="agent_failed_start">Agent 启动失败: %s</string>
+
+    <!-- Tile Service -->
+    <string name="running">运行中</string>
+    <string name="stopped">已停止</string>
+    <string name="not_installed">未安装</string>
+    <string name="agent_not_installed_toast">哪吒 Agent 二进制文件未安装。请打开应用下载。</string>
+    <string name="agent_not_configured_toast">哪吒 Agent 未配置。请在应用中配置服务器和密钥。</string>
+    <string name="failed_start_service">启动哪吒 Agent 失败: %s</string>
+    <string name="failed_stop_service">停止哪吒 Agent 失败: %s</string>
+    
+    <!-- Error Messages -->
+    <string name="agent_config_incomplete">哪吒 Agent 配置不完整。请配置服务器和密钥。</string>
+    <string name="failed_download_binary">下载哪吒 Agent 二进制文件失败</string>
+    <string name="failed_create_config_file">创建配置文件失败</string>
+    <string name="failed_start_agent">启动 Agent 失败: %s</string>
+
+    <!-- Layout Strings -->
+    <string name="app_description">Android 哪吒监控 Agent</string>
+    <string name="nezha_agent_title">哪吒 Agent</string>
+    <string name="configuration">配置</string>
+    <string name="configure_server">配置服务器</string>
+    <string name="system_information">系统信息</string>
+    <string name="architecture">架构</string>
+    <string name="root_access">Root 权限</string>
+    <string name="checking">检查中...</string>
+    <string name="advanced_settings">高级设置</string>
+    <string name="acquire_wake_lock">获取唤醒锁</string>
+    <string name="wake_lock_description">防止 CPU 休眠以确保持续监控</string>
+    <string name="enable_logging">启用内存日志</string>
+    <string name="logging_description">在内存中保存日志用于调试（最多10,000条）</string>
+    <string name="actions">操作</string>
+    <string name="view_logs">查看日志</string>
+    
+    <!-- Theme Settings -->
+    <string name="theme_settings">主题设置</string>
+    <string name="material_you_dynamic_color">Material You 动态色彩</string>
+    <string name="material_you_description">使用系统壁纸颜色（Android 12+）</string>
+    <string name="follow_system_theme">跟随系统主题</string>
+    <string name="follow_system_description">自动在浅色和深色主题之间切换</string>
+    <string name="dark_mode">深色模式</string>
+    <string name="dark_mode_description">无论系统设置如何都使用深色主题</string>
+    
+    <!-- Logs Activity -->
+    <string name="no_logs_yet">尚无日志记录</string>
+    <string name="logging_disabled">内存日志已禁用。\n在设置中启用以捕获日志。</string>
+    <string name="logs_cleared">日志已清除</string>
+    <string name="logs_copied_to_clipboard">已复制 %d 条日志到剪贴板</string>
+    <string name="no_logs_to_copy">没有日志可复制</string>
+    <string name="clear_logs">清除日志</string>
+    <string name="copy_logs">复制日志</string>
+    <string name="scroll_to_top">滚动到顶部</string>
+    <string name="scroll_to_bottom">滚动到底部</string>
+    
+    <!-- Content Descriptions -->
+    <string name="back">返回</string>
+    <string name="menu">菜单</string>
+    
+    <!-- Permission Names -->
+    <string name="internet_access">网络访问</string>
+    <string name="notifications">通知</string>
+    <string name="permission_item">• %s</string>
+    <string name="unknown_permission">未知权限</string>
+    
+    <!-- Clipboard -->
+    <string name="app_logs">应用日志</string>
+</resources>

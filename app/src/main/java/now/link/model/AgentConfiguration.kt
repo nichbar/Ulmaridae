@@ -4,5 +4,6 @@ data class AgentConfiguration(
     val server: String = "",
     val secret: String = "",
     val clientId: String = "",
-    val enableTLS: Boolean = true
+    val uuid: String = "",
+    val enableTLS: Boolean = true,
 )

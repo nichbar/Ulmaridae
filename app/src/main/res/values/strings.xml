@@ -1,3 +1,120 @@
 <resources>
-    <string name="app_name">Nezha Wrapper</string>
+    <string name="app_name">Ulmaridae</string>
+    
+    <!-- Main Activity -->
+    <string name="agent_running">Agent is running</string>
+    <string name="agent_stopped">Agent is stopped</string>
+    <string name="root_available">Available</string>
+    <string name="root_not_available">Not available</string>
+    <string name="not_configured">Not configured</string>
+    <string name="server_format">Server: %s</string>
+    <string name="logs_coming_soon">Logs feature coming soon</string>
+    
+    <!-- Service Control Button States -->
+    <string name="start_agent">Start Agent</string>
+    <string name="stop_agent">Stop Agent</string>
+    <string name="starting_agent">Starting…</string>
+    <string name="stopping_agent">Stopping…</string>
+    <string name="downloading">Downloading…</string>
+    <string name="configuring">Configuring…</string>
+    
+    <!-- Configuration Dialog -->
+    <string name="configure_nezha_agent">Configure Nezha Agent</string>
+    <string name="configuration_dialog_description">Enter your Nezha server URL and agent secret. UUID is optional for identifying the device. These can be found in your Nezha dashboard.</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="configuration_saved">Configuration saved</string>
+    <string name="fill_required_fields">Please fill required fields</string>
+    <string name="error_showing_config_dialog">Error showing configuration dialog: %s</string>
+    
+    <!-- Permissions -->
+    <string name="permissions_required">Permissions Required</string>
+    <string name="permissions_message">This app requires certain permissions to function properly. You can grant them in app settings or continue with limited functionality.</string>
+    <string name="settings">Settings</string>
+    <string name="continue_anyway">Continue Anyway</string>
+    <string name="retry">Retry</string>
+    
+    <!-- Wake Lock -->
+    <string name="wake_lock_enabled">Wake Lock Enabled</string>
+    <string name="wake_lock_info">Wake Lock prevents your device\'s CPU from going to sleep, ensuring continuous monitoring.\n\nBenefits:\n• Prevents monitoring interruptions\n• Ensures real-time data reporting\n• Maintains stable connection\n\nNote: This may increase battery consumption. The wake lock is only active when the monitoring service is running.</string>
+    <string name="got_it">Got it</string>
+    
+    <!-- Service Notifications -->
+    <string name="nezha_agent">Nezha Agent</string>
+    <string name="nezha_agent_running">Nezha Agent running</string>
+    <string name="nezha_agent_running_root">Nezha Agent running (root)</string>
+    <string name="nezha_agent_service">Nezha Agent Service</string>
+    <string name="nezha_agent_service_description">Nezha monitoring agent background service</string>
+    <string name="stop">Stop</string>
+    <string name="downloading_agent">Downloading nezha-agent binary...</string>
+    <string name="failed_download_agent">Failed to download agent binary</string>
+    <string name="agent_downloaded_starting">Agent binary downloaded, starting...</string>
+    <string name="agent_not_configured">Agent not configured</string>
+    <string name="failed_create_config">Failed to create config file</string>
+    <string name="agent_failed_start">Agent failed to start: %s</string>
+
+    <!-- Tile Service -->
+    <string name="running">Running</string>
+    <string name="stopped">Stopped</string>
+    <string name="not_installed">Not installed</string>
+    <string name="agent_not_installed_toast">Nezha agent binary not installed. Please open the app to download it.</string>
+    <string name="agent_not_configured_toast">Nezha agent not configured. Please configure server and secret in the app.</string>
+    <string name="failed_start_service">Failed to start Nezha Agent: %s</string>
+    <string name="failed_stop_service">Failed to stop Nezha Agent: %s</string>
+    
+    <!-- Error Messages -->
+    <string name="agent_config_incomplete">Nezha agent configuration is incomplete. Please configure server and secret.</string>
+    <string name="failed_download_binary">Failed to download nezha-agent binary</string>
+    <string name="failed_create_config_file">Failed to create configuration file</string>
+    <string name="failed_start_agent">Failed to start agent: %s</string>
+    
+    <!-- Layout Strings -->
+    <string name="app_description">Nezha monitoring agent for Android</string>
+    <string name="nezha_agent_title">Nezha Agent</string>
+    <string name="configuration">Configuration</string>
+    <string name="configure_server">Configure Server</string>
+    <string name="system_information">System Information</string>
+    <string name="architecture">Architecture</string>
+    <string name="root_access">Root Access</string>
+    <string name="checking">Checking...</string>
+    <string name="advanced_settings">Advanced Settings</string>
+    <string name="acquire_wake_lock">Acquire Wake Lock</string>
+    <string name="wake_lock_description">Prevents CPU sleep to ensure continuous monitoring</string>
+    <string name="enable_logging">Enable In-Memory Logging</string>
+    <string name="logging_description">Save logs in memory for debugging (max 10,000 entries)</string>
+    <string name="actions">Actions</string>
+    <string name="view_logs">View Logs</string>
+    
+    <!-- Theme Settings -->
+    <string name="theme_settings">Theme Settings</string>
+    <string name="material_you_dynamic_color">Material You Dynamic Color</string>
+    <string name="material_you_description">Use system wallpaper colors (Android 12+)</string>
+    <string name="follow_system_theme">Follow System Theme</string>
+    <string name="follow_system_description">Automatically switch between light and dark themes</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="dark_mode_description">Use dark theme regardless of system setting</string>
+    
+    <!-- Logs Activity -->
+    <string name="no_logs_yet">No logs captured yet</string>
+    <string name="logging_disabled">In-memory logging is disabled.\nEnable it in settings to capture logs.</string>
+    <string name="logs_cleared">Logs cleared</string>
+    <string name="logs_copied_to_clipboard">%d log entries copied to clipboard</string>
+    <string name="no_logs_to_copy">No logs to copy</string>
+    <string name="clear_logs">Clear Logs</string>
+    <string name="copy_logs">Copy Logs</string>
+    <string name="scroll_to_top">Scroll to Top</string>
+    <string name="scroll_to_bottom">Scroll to Bottom</string>
+    
+    <!-- Content Descriptions -->
+    <string name="back">Back</string>
+    <string name="menu">Menu</string>
+    
+    <!-- Permission Names -->
+    <string name="internet_access">Internet Access</string>
+    <string name="notifications">Notifications</string>
+    <string name="permission_item">• %s</string>
+    <string name="unknown_permission">Unknown Permission</string>
+    
+    <!-- Clipboard -->
+    <string name="app_logs">App Logs</string>
 </resources>

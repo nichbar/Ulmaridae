@@ -10,6 +10,13 @@
 .DS_Store
 /build
 /captures
+/app/release
 .externalNativeBuild
 .cxx
 local.properties
+
+# Signing configuration (contains sensitive information)
+signing.properties
+keystore.jks
+*.keystore
+.kotlin

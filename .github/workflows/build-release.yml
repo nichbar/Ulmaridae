@@ -1,0 +1,248 @@
+name: Build and Release APK
+
+on:
+    push:
+        tags:
+            - "v*"
+    pull_request:
+        branches: [main]
+    workflow_dispatch:
+
+env:
+    GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4g -XX:+HeapDumpOnOutOfMemoryError"
+
+jobs:
+    build-arm64:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                arch: [arm64]
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up JDK 17
+              uses: actions/setup-java@v4
+              with:
+                  java-version: "17"
+                  distribution: "temurin"
+
+            - name: Cache Gradle dependencies
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.gradle/caches
+                      ~/.gradle/wrapper
+                  key: ${{ runner.os }}-gradle-${{ matrix.arch }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+                  restore-keys: |
+                      ${{ runner.os }}-gradle-${{ matrix.arch }}-
+                      ${{ runner.os }}-gradle-
+
+            - name: Make gradlew executable
+              run: chmod +x gradlew
+
+            - name: Make download script executable
+              run: chmod +x download-agent.sh
+
+            - name: Download ARM64 Nezha agent binary
+              run: |
+                  echo "Downloading ARM64 binary..."
+                  ./download-agent.sh arm64
+
+            - name: Build release APK for ARM64 (if signed)
+              if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+              env:
+                  KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+                  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+                  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+                  KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+              run: |
+                  if [ -n "$KEYSTORE_FILE" ]; then
+                    echo "Keystore found, building signed release APK for ARM64..."
+                    echo "$KEYSTORE_FILE" | base64 -d > keystore.jks
+                    ./gradlew assembleRelease --stacktrace
+                  else
+                    echo "No keystore configured, skipping signed release build"
+                  fi
+                  mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/app-arm64-v8a-release.apk
+
+            - name: Upload ARM64 release APK
+              if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+              uses: actions/upload-artifact@v4
+              with:
+                  name: app-release-arm64
+                  path: app/build/outputs/apk/release/app-arm64-v8a-release.apk
+
+    build-arm:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                arch: [arm]
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up JDK 17
+              uses: actions/setup-java@v4
+              with:
+                  java-version: "17"
+                  distribution: "temurin"
+
+            - name: Cache Gradle dependencies
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.gradle/caches
+                      ~/.gradle/wrapper
+                  key: ${{ runner.os }}-gradle-${{ matrix.arch }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+                  restore-keys: |
+                      ${{ runner.os }}-gradle-${{ matrix.arch }}-
+                      ${{ runner.os }}-gradle-
+
+            - name: Make gradlew executable
+              run: chmod +x gradlew
+
+            - name: Make download script executable
+              run: chmod +x download-agent.sh
+
+            - name: Download ARM Nezha agent binary
+              run: |
+                  echo "Downloading ARM binary..."
+                  ./download-agent.sh arm
+
+            - name: Build release APK for ARM (if signed)
+              if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+              env:
+                  KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+                  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+                  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+                  KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+              run: |
+                  if [ -n "$KEYSTORE_FILE" ]; then
+                    echo "Keystore found, building signed release APK for ARM..."
+                    echo "$KEYSTORE_FILE" | base64 -d > keystore.jks
+                    ./gradlew assembleRelease --stacktrace
+                  else
+                    echo "No keystore configured, skipping signed release build"
+                  fi
+                  mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/app-armeabi-v7a-release.apk
+
+            - name: Upload ARM release APK
+              if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+              uses: actions/upload-artifact@v4
+              with:
+                  name: app-release-arm
+                  path: app/build/outputs/apk/release/app-armeabi-v7a-release.apk
+
+    release:
+        needs: [build-arm64, build-arm]
+        runs-on: ubuntu-latest
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Download ARM64 release APK (if available)
+              continue-on-error: true
+              uses: actions/download-artifact@v4
+              with:
+                  name: app-release-arm64
+                  path: ./artifacts/arm64/
+
+            - name: Download ARM release APK (if available)
+              continue-on-error: true
+              uses: actions/download-artifact@v4
+              with:
+                  name: app-release-arm
+                  path: ./artifacts/arm/
+
+            - name: Get version from tag
+              id: version
+              run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+            - name: Prepare release files
+              run: |
+                  mkdir -p release-files
+
+                  # Copy ARM64 release APK with version name
+                  if [ -f "./artifacts/arm64/app-arm64-v8a-release.apk" ]; then
+                    cp "./artifacts/arm64/app-arm64-v8a-release.apk" "release-files/Ulmaridae-${{ steps.version.outputs.VERSION }}-arm64-release.apk"
+                  fi
+
+                  # Copy ARM release APK with version name
+                  if [ -f "./artifacts/arm/app-armeabi-v7a-release.apk" ]; then
+                    cp "./artifacts/arm/app-armeabi-v7a-release.apk" "release-files/Ulmaridae-${{ steps.version.outputs.VERSION }}-arm-release.apk"
+                  fi
+
+                  # List files for verification
+                  ls
+                  ls -la release-files/
+
+            - name: Generate release notes
+              id: release_notes
+              run: |
+                  RELEASE_NOTES="
+
+                  ## 🚀 **Ulmaridae ${{ steps.version.outputs.VERSION }}**
+
+                  A lightweight Android wrapper for the Nezha monitoring agent, designed to run on Android devices with or without root privileges.
+
+                  ### Installation
+                  1. Download the appropriate APK for your device architecture
+                  2. Install the APK (enable \"Install from unknown sources\" if needed)
+                  3. Open the app and configure your Nezha server details
+                  4. Grant necessary permissions when prompted
+                  5. Toggle the \"Enable Nezha Agent\" switch to start monitoring
+
+                  ### APK Variants
+
+                  #### ARM64 (arm64) - Recommended for modern devices
+                  #### ARM (armeabi-v7a) - For older devices  
+
+                  ### Requirements
+                  - Android 7.0 (API level 24) or higher
+                  - ARM or ARM64 device architecture
+                  - Internet connection for server communication"
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ steps.version.outputs.VERSION }}
+                  name: "Ulmaridae ${{ steps.version.outputs.VERSION }}"
+                  body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
+                  files: release-files/*
+                  draft: false
+                  prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
+                  generate_release_notes: true
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    security-scan:
+        runs-on: ubuntu-latest
+        if: github.event_name == 'pull_request'
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up JDK 17
+              uses: actions/setup-java@v4
+              with:
+                  java-version: "17"
+                  distribution: "temurin"
+
+            - name: Cache Gradle dependencies
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.gradle/caches
+                      ~/.gradle/wrapper
+                  key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+                  restore-keys: |
+                      ${{ runner.os }}-gradle-
+
+            - name: Make gradlew executable
+              run: chmod +x gradlew

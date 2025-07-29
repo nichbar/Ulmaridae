@@ -1,44 +1,33 @@
-# Nezha Agent Android Wrapper
+# Ulmaridae
 
-An Android wrapper application for [Nezha](https://github.com/nezhahq/agent) monitoring agent, designed to run the agent on Android devices even with root privileges.
+[![Build and Release](https://github.com/nichbar/Ulmaridae/actions/workflows/build-release.yml/badge.svg)](https://github.com/nichbar/Ulmaridae/actions/workflows/build-release.yml)
+[![CI](https://github.com/nichbar/Ulmaridae/actions/workflows/ci.yml/badge.svg)](https://github.com/nichbar/Ulmaridae/actions/workflows/ci.yml)
+
+An Android wrapper application for [Nezha](https://github.com/nezhahq/nezha) monitoring agent, designed to run the agent on Android devices even without root privileges.
 
 ## Features
 
 - ✅ **Simple UI**: Clean Material Design interface with toggle controls
 - ✅ **Background Service**: Runs Nezha agent as a persistent foreground service
 - ✅ **Root Support**: Automatically detects and uses root privileges when available
-- ✅ **Auto-start**: Automatically starts the agent on device boot
-- ✅ **ARM Support**: Automatically downloads and bundles the appropriate ARM binary
 - ✅ **Battery Optimization**: Requests exemption from battery optimization
 - ✅ **Network Permissions**: Handles all required permissions automatically
 
-## Installation
+## Installation & Configuration
 
-1. Build the APK:
+1. Download and install the latest APK from the [releases page](https://github.com/nichbar/Ulmaridae/releases)
+2. Open the app on your Android device
+3. Tap "Configure" to set up your Nezha server details:
 
-   ```bash
-   ./gradlew assembleDebug
-   ```
-
-2. Install on your Android device:
-   ```bash
-   adb install app/build/outputs/apk/debug/app-debug.apk
-   ```
-
-## Configuration
-
-1. Open the app on your Android device
-2. Tap "Configure" to set up your Nezha server details:
-
-   - **Server URL**: Your Nezha server URL (e.g., `https://your-server.com:5555`)
+   - **Server URL**: Your Nezha server URL (e.g., `https://your-server.com:443`)
    - **Agent Secret**: The secret key for your agent (found in Nezha dashboard)
 
-3. Grant the necessary permissions when prompted:
-   - Internet access
-   - Network state access
+4. Grant the necessary permissions when prompted:
    - Foreground service permission
-   - Boot receiver permission
    - Battery optimization exemption
+   - Root access (if available)
+
+5. Toggle the "Enable Nezha Agent" switch to start the agent
 
 ## Usage
 
@@ -52,7 +41,6 @@ An Android wrapper application for [Nezha](https://github.com/nezhahq/agent) mon
 ### Background Operation
 
 - The agent runs as a foreground service with a persistent notification
-- It will automatically restart on device boot
 - The service continues running even when the app is closed
 - Root privileges are automatically used if available
 
@@ -72,19 +60,9 @@ Or use the notification:
 
 - **MainActivity**: Main UI with configuration and control
 - **NezhaAgentService**: Background service that manages the agent process
-- **BootReceiver**: Handles auto-start on device boot
-- **AgentManager**: Downloads and manages the Nezha agent binary
+- **AgentManager**: Extracts and manages the bundled Nezha agent binary
 - **ConfigurationManager**: Handles settings storage
 - **RootUtils**: Detects and uses root privileges
-
-### Binary Management
-
-The app automatically:
-
-1. Detects device architecture (ARM64, ARM, x86_64, x86)
-2. Downloads the appropriate Nezha agent binary from GitHub releases
-3. Extracts and makes the binary executable
-4. Stores it in the app's private files directory
 
 ### Root vs Non-Root Operation
 
@@ -98,7 +76,7 @@ The app automatically:
 **Without Root Access:**
 
 - Agent runs with standard app permissions
-- Limited but functional monitoring
+- Limited but functional monitoring (app-level metrics)
 - Basic system information available
 - Network and storage monitoring works
 
@@ -106,14 +84,12 @@ The app automatically:
 
 | Permission                             | Purpose                                  |
 | -------------------------------------- | ---------------------------------------- |
-| `INTERNET`                             | Network communication with Nezha server  |
+| `INTERNET`                             | Network communication with server        |
 | `ACCESS_NETWORK_STATE`                 | Monitor network connectivity             |
 | `FOREGROUND_SERVICE`                   | Run background service                   |
 | `FOREGROUND_SERVICE_SYSTEM_EXEMPTED`   | System-level service exemption           |
 | `WAKE_LOCK`                            | Keep device awake for monitoring         |
 | `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | Prevent Android from killing the service |
-| `WRITE_EXTERNAL_STORAGE`               | Store agent binary and logs              |
-| `RECEIVE_BOOT_COMPLETED`               | Auto-start on device boot                |
 | `POST_NOTIFICATIONS`                   | Show service notifications (Android 13+) |
 | `ACCESS_SUPERUSER`                     | Root access (if available)               |
 
@@ -121,10 +97,10 @@ The app automatically:
 
 ### Agent Won't Start
 
-1. Check internet connectivity
+1. Check internet connectivity (for server communication)
 2. Verify server URL and secret are correct
-3. Check if agent binary downloaded successfully
-4. Look at system logs: `adb logcat | grep NezhaAgentService`
+3. Check if agent binary was extracted successfully
+4. Enable in-memory logging and check logs
 
 ### Service Keeps Stopping
 
@@ -141,26 +117,27 @@ The app automatically:
 ### Performance Impact
 
 - The app has minimal impact on device performance
-- Agent binary is lightweight (~6MB)
 - Network usage depends on monitoring frequency
-- Battery usage is optimized for background operation
 
 ## Building from Source
 
 ### Prerequisites
 
 - Android Studio or Android SDK
-- Java 11 or higher
+- Java 17 or higher
 - Gradle 8.11.0+
 
 ### Build Steps
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
-cd nzwrapper
+git clone https://github.com/nichbar/Ulmaridae.git
+cd Ulmaridae
 
-# Build debug APK
+# Download nezha binary for ARM or ARM64 architecture
+./download-agent.sh arm64
+
+# Build debug APK (includes bundled Nezha agent binary)
 ./gradlew assembleDebug
 
 # Build release APK (requires signing config)
@@ -190,9 +167,9 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENS
 For issues and questions:
 
 1. Check the troubleshooting section above
-2. Review device logs: `adb logcat | grep Nezha`
+2. Review logs by enabling in-memory logging in the app
 3. Open an issue on the repository
 
 ---
 
-**Note**: This wrapper is designed for Android devices and has been tested on ARM-based Android smartphones and tablets. Root access is optional but recommended for full functionality.
+**Note**: This wrapper is designed for ARM AND ARM64 Android devices and has been tested on modern Android smartphones and tablets. The bundled binary is optimized for ARM and ARM64 architecture, which covers the vast majority of contemporary Android devices. Root access is optional but recommended for full functionality.
