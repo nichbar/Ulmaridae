@@ -3,13 +3,7 @@
 [![Build and Release](https://github.com/nichbar/Ulmaridae/actions/workflows/build-release.yml/badge.svg)](https://github.com/nichbar/Ulmaridae/actions/workflows/build-release.yml)
 [![CI](https://github.com/nichbar/Ulmaridae/actions/workflows/ci.yml/badge.svg)](https://github.com/nichbar/Ulmaridae/actions/workflows/ci.yml)
 
-Ulmaridae is an Android wrapper application for the [Nezha](https://github.com/nezhahq/nezha) monitoring agent, designed to run the agent on Android devices, even without root privileges.
-
-The original [Nezha Agent](https://github.com/nezhahq/agent) is built for standard Linux environments, and some of its features will not work on Android, even if root privileges are granted. This project aims to make it work on Android with ease.
-
-This project uses a modified version of the [Nezha Agent](https://github.com/nichbar/agent) to work better on Android.
-
-All binaries are built from source using GitHub Actions.
+Ulmaridae is an Android wrapper application for the modified [Nezha agent](](https://github.com/nezhahq/agent)) , designed to run the agent on Android devices, even without root privileges.
 
 ## Installation & Configuration
 
@@ -17,13 +11,14 @@ All binaries are built from source using GitHub Actions.
 2. Open the app on your Android device
 3. Tap "Configure" to set up your Nezha server details:
 
-   - **Server URL**: Your Nezha server URL (e.g., `https://your-server.com:443`)
+   - **Server URL**: Your Nezha server URL (e.g., `your-server.com:443`)
    - **Agent Secret**: The secret key for your agent (found in Nezha dashboard)
+   - **UUID**: Unique identifier for the agent (optional, can be auto-generated)
 
 4. Grant the necessary permissions when prompted:
+   - Root access (if available)
    - Foreground service permission
    - Battery optimization exemption
-   - Root access (if available)
 
 5. Toggle the "Enable Nezha Agent" switch to start the agent
 
@@ -36,12 +31,6 @@ All binaries are built from source using GitHub Actions.
 3. Toggle the "Enable Nezha Agent" switch
 4. The agent will start running in the background
 
-### Background Operation
-
-- The agent runs as a foreground service with a persistent notification
-- The service continues running even when the app is closed
-- Root privileges are automatically used if available
-
 ### Stopping the Agent
 
 1. Open the app
@@ -53,14 +42,6 @@ Or use the notification:
 2. Tap "Stop" on the Nezha Agent notification
 
 ## Architecture
-
-### Components
-
-- **MainActivity**: Main UI with configuration and control
-- **NezhaAgentService**: Background service that manages the agent process
-- **AgentManager**: Extracts and manages the bundled Nezha agent binary
-- **ConfigurationManager**: Handles settings storage
-- **RootUtils**: Detects and uses root privileges
 
 ### Root vs Non-Root Operation
 
@@ -77,45 +58,6 @@ Or use the notification:
 - Limited but functional monitoring (app-level metrics)
 - Basic system information available
 - Network and storage monitoring works
-
-## Permissions Explained
-
-| Permission                             | Purpose                                  |
-| -------------------------------------- | ---------------------------------------- |
-| `INTERNET`                             | Network communication with server        |
-| `ACCESS_NETWORK_STATE`                 | Monitor network connectivity             |
-| `FOREGROUND_SERVICE`                   | Run background service                   |
-| `FOREGROUND_SERVICE_SYSTEM_EXEMPTED`   | System-level service exemption           |
-| `WAKE_LOCK`                            | Keep device awake for monitoring         |
-| `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | Prevent Android from killing the service |
-| `POST_NOTIFICATIONS`                   | Show service notifications (Android 13+) |
-| `ACCESS_SUPERUSER`                     | Root access (if available)               |
-
-## Troubleshooting
-
-### Agent Won't Start
-
-1. Check internet connectivity (for server communication)
-2. Verify server URL and secret are correct
-3. Check if agent binary was extracted successfully
-4. Enable in-memory logging and check logs
-
-### Service Keeps Stopping
-
-1. Disable battery optimization for the app
-2. Add the app to auto-start apps (varies by manufacturer)
-3. Check if the device has aggressive memory management
-
-### Root Detection Issues
-
-1. Ensure your device is properly rooted
-2. Grant root access to the app when prompted
-3. Some root management apps may require manual approval
-
-### Performance Impact
-
-- The app has minimal impact on device performance
-- Network usage depends on monitoring frequency
 
 ## Building from Source
 
