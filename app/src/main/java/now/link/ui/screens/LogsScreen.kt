@@ -52,7 +52,7 @@ fun LogsScreen(
     LaunchedEffect(logEntries.size) {
         if (logEntries.isNotEmpty()) {
             coroutineScope.launch {
-                listState.animateScrollToItem(logEntries.size - 1)
+                listState.scrollToItem(logEntries.size - 1)
             }
         }
     }

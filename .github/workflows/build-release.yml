@@ -12,11 +12,8 @@ env:
     GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4g -XX:+HeapDumpOnOutOfMemoryError"
 
 jobs:
-    build-arm64:
+    build-release:
         runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                arch: [arm64]
 
         steps:
             - name: Checkout code
@@ -34,85 +31,23 @@ jobs:
                   path: |
                       ~/.gradle/caches
                       ~/.gradle/wrapper
-                  key: ${{ runner.os }}-gradle-${{ matrix.arch }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+                  key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
                   restore-keys: |
-                      ${{ runner.os }}-gradle-${{ matrix.arch }}-
                       ${{ runner.os }}-gradle-
 
-            - name: Make gradlew executable
-              run: chmod +x gradlew
+            - name: Make scripts executable
+              run: |
+                  chmod +x gradlew
+                  chmod +x download-agent.sh
 
-            - name: Make download script executable
-              run: chmod +x download-agent.sh
-
-            - name: Download ARM64 Nezha agent binary
+            - name: Download Nezha agent binaries for all architectures
               run: |
                   echo "Downloading ARM64 binary..."
                   ./download-agent.sh arm64
-
-            - name: Build release APK for ARM64 (if signed)
-              if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-              env:
-                  KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
-                  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-                  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-                  KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-              run: |
-                  if [ -n "$KEYSTORE_FILE" ]; then
-                    echo "Keystore found, building signed release APK for ARM64..."
-                    echo "$KEYSTORE_FILE" | base64 -d > keystore.jks
-                    ./gradlew assembleRelease --stacktrace
-                  else
-                    echo "No keystore configured, skipping signed release build"
-                  fi
-                  mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/app-arm64-v8a-release.apk
-
-            - name: Upload ARM64 release APK
-              if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-              uses: actions/upload-artifact@v4
-              with:
-                  name: app-release-arm64
-                  path: app/build/outputs/apk/release/app-arm64-v8a-release.apk
-
-    build-arm:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                arch: [arm]
-
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-
-            - name: Set up JDK 17
-              uses: actions/setup-java@v4
-              with:
-                  java-version: "17"
-                  distribution: "temurin"
-
-            - name: Cache Gradle dependencies
-              uses: actions/cache@v4
-              with:
-                  path: |
-                      ~/.gradle/caches
-                      ~/.gradle/wrapper
-                  key: ${{ runner.os }}-gradle-${{ matrix.arch }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-                  restore-keys: |
-                      ${{ runner.os }}-gradle-${{ matrix.arch }}-
-                      ${{ runner.os }}-gradle-
-
-            - name: Make gradlew executable
-              run: chmod +x gradlew
-
-            - name: Make download script executable
-              run: chmod +x download-agent.sh
-
-            - name: Download ARM Nezha agent binary
-              run: |
-                  echo "Downloading ARM binary..."
+                  echo "Downloading ARM32 binary..."
                   ./download-agent.sh arm
 
-            - name: Build release APK for ARM (if signed)
+            - name: Build release APKs (if signed)
               if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
               env:
                   KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
@@ -121,23 +56,27 @@ jobs:
                   KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
               run: |
                   if [ -n "$KEYSTORE_FILE" ]; then
-                    echo "Keystore found, building signed release APK for ARM..."
+                    echo "Keystore found, building signed release APKs..."
                     echo "$KEYSTORE_FILE" | base64 -d > keystore.jks
                     ./gradlew assembleRelease --stacktrace
                   else
                     echo "No keystore configured, skipping signed release build"
                   fi
-                  mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/app-armeabi-v7a-release.apk
 
-            - name: Upload ARM release APK
+            - name: List generated APKs
+              run: |
+                  echo "Release APKs:"
+                  ls -la app/build/outputs/apk/release/
+
+            - name: Upload release APKs
               if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
               uses: actions/upload-artifact@v4
               with:
-                  name: app-release-arm
-                  path: app/build/outputs/apk/release/app-armeabi-v7a-release.apk
+                  name: release-apks
+                  path: app/build/outputs/apk/release/*.apk
 
     release:
-        needs: [build-arm64, build-arm]
+        needs: [build-release]
         runs-on: ubuntu-latest
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
 
@@ -145,19 +84,11 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Download ARM64 release APK (if available)
-              continue-on-error: true
+            - name: Download release APKs
               uses: actions/download-artifact@v4
               with:
-                  name: app-release-arm64
-                  path: ./artifacts/arm64/
-
-            - name: Download ARM release APK (if available)
-              continue-on-error: true
-              uses: actions/download-artifact@v4
-              with:
-                  name: app-release-arm
-                  path: ./artifacts/arm/
+                  name: release-apks
+                  path: ./artifacts/
 
             - name: Get version from tag
               id: version
@@ -167,18 +98,19 @@ jobs:
               run: |
                   mkdir -p release-files
 
-                  # Copy ARM64 release APK with version name
-                  if [ -f "./artifacts/arm64/app-arm64-v8a-release.apk" ]; then
-                    cp "./artifacts/arm64/app-arm64-v8a-release.apk" "release-files/Ulmaridae-${{ steps.version.outputs.VERSION }}-arm64-release.apk"
+                  # Copy APKs with version names
+                  if [ -f "./artifacts/app-arm64-v8a-release.apk" ]; then
+                    cp "./artifacts/app-arm64-v8a-release.apk" "release-files/Ulmaridae-${{ steps.version.outputs.VERSION }}-arm64-release.apk"
                   fi
 
-                  # Copy ARM release APK with version name
-                  if [ -f "./artifacts/arm/app-armeabi-v7a-release.apk" ]; then
-                    cp "./artifacts/arm/app-armeabi-v7a-release.apk" "release-files/Ulmaridae-${{ steps.version.outputs.VERSION }}-arm-release.apk"
+                  if [ -f "./artifacts/app-armeabi-v7a-release.apk" ]; then
+                    cp "./artifacts/app-armeabi-v7a-release.apk" "release-files/Ulmaridae-${{ steps.version.outputs.VERSION }}-arm-release.apk"
                   fi
 
                   # List files for verification
-                  ls
+                  echo "Downloaded artifacts:"
+                  ls -la artifacts/
+                  echo "Release files:"
                   ls -la release-files/
 
             - name: Generate release notes
@@ -206,7 +138,10 @@ jobs:
                   - Android 7.0 (API level 24) or higher
                   - ARM or ARM64 device architecture
                   - Internet connection for server communication"
-
+                
+                  echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+                  echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
+                  echo "EOF" >> $GITHUB_OUTPUT
             - name: Create GitHub Release
               uses: softprops/action-gh-release@v2
               with:

@@ -112,19 +112,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun initializeAgent() {
-        viewModelScope.launch {
-            if (!agentManager.isAgentInstalled()) {
-                val success = agentManager.extractAndInstallAgent()
-                if (!success) {
-                    _uiState.update { 
-                        it.copy(errorMessage = "Failed to extract agent binary")
-                    }
-                }
-            }
-        }
-    }
-
     // Service control methods
     fun startService(context: Context) {
         viewModelScope.launch {

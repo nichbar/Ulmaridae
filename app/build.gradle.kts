@@ -13,18 +13,23 @@ android {
     defaultConfig {
         applicationId = "now.link.ulmaridae"
         minSdk = 24
-        targetSdk = 28 // Target SDK 28 for compatibility with older devices
-        versionCode = 1
-        versionName = "0.1"
+        targetSdk = 36
+        versionCode = 2
+        versionName = "0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
         // Optimize for size - disable multidex if not needed
         multiDexEnabled = false
+    }
 
-        // Limit to essential ABIs only (saves significant space)
-        ndk {
-            abiFilters += listOf("armeabi-v7a", "arm64-v8a")  // Most common architectures
+    // Configure ABI splits to build separate APKs for each architecture
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a")
+            isUniversalApk = false  // Set to true if you also want a universal APK
         }
     }
 

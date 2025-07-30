@@ -100,13 +100,6 @@ class NezhaAgentTileService : TileService() {
     }
 
     private fun validateAndStartService() {
-        // Check if agent is installed
-        if (!agentManager.isAgentInstalled()) {
-            Log.w(TAG, "Agent not installed")
-            showToastAndOpenApp(getString(R.string.agent_not_installed_toast))
-            return
-        }
-
         // Check if configuration is valid
         if (!configManager.isConfigured()) {
             Log.w(TAG, "Agent not configured")
@@ -183,7 +176,6 @@ class NezhaAgentTileService : TileService() {
 
         // Check configuration status for better tile state
         val isConfigured = ::configManager.isInitialized && configManager.isConfigured()
-        val isAgentInstalled = ::agentManager.isInitialized && agentManager.isAgentInstalled()
 
         when {
             isServiceCurrentlyRunning -> {
@@ -191,14 +183,6 @@ class NezhaAgentTileService : TileService() {
                 tile.label = getString(R.string.nezha_agent)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     tile.subtitle = getString(R.string.running)
-                }
-            }
-
-            !isAgentInstalled -> {
-                tile.state = Tile.STATE_INACTIVE
-                tile.label = getString(R.string.nezha_agent)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    tile.subtitle = getString(R.string.not_installed)
                 }
             }
 
@@ -225,7 +209,7 @@ class NezhaAgentTileService : TileService() {
         tile.updateTile()
         Log.d(
             TAG,
-            "Tile updated - service running: $isServiceCurrentlyRunning, configured: $isConfigured, installed: $isAgentInstalled"
+            "Tile updated - service running: $isServiceCurrentlyRunning, configured: $isConfigured"
         )
     }
 }

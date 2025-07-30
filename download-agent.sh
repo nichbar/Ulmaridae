@@ -15,8 +15,29 @@ NC='\033[0m' # No Color
 
 # Script configuration
 GITHUB_REPO="nichbar/agent"
-ASSETS_DIR="app/src/main/assets/binaries"
 TEMP_DIR="/tmp/nezha-agent-download"
+
+# Function to get JNI lib directory based on architecture
+get_jni_lib_dir() {
+    local arch="$1"
+    case "$arch" in
+        arm64)
+            echo "app/src/main/jniLibs/arm64-v8a"
+            ;;
+        arm)
+            echo "app/src/main/jniLibs/armeabi-v7a"
+            ;;
+        amd64)
+            echo "app/src/main/jniLibs/x86_64"
+            ;;
+        386)
+            echo "app/src/main/jniLibs/x86"
+            ;;
+        *)
+            echo "app/src/main/jniLibs/unsupported"
+            ;;
+    esac
+}
 
 # Function to print colored output
 print_info() {
@@ -40,23 +61,28 @@ show_usage() {
     echo "Usage: $0 <architecture>"
     echo ""
     echo "Available architectures:"
-    echo "  arm64      - ARM 64-bit (recommended for Android)"
-    echo "  amd64      - x86 64-bit"
-    echo "  arm        - ARM 32-bit"
-    echo "  386        - x86 32-bit"
-    echo "  mips       - MIPS"
-    echo "  mipsle     - MIPS Little Endian"
-    echo "  riscv64    - RISC-V 64-bit"
-    echo "  s390x      - IBM S/390"
+    echo "  arm64      - ARM 64-bit → arm64-v8a (recommended for Android)"
+    echo "  arm        - ARM 32-bit → armeabi-v7a"
+    echo "  amd64      - x86 64-bit → x86_64"
+    echo "  386        - x86 32-bit → x86"
+    echo ""
+    echo "Note: Other architectures (mips, mipsle, riscv64, s390x) are not supported for Android JNI"
     echo ""
     echo "Special commands:"
-    echo "  --version  - Show current binary version (if exists)"
-    echo "  --help     - Show this help message"
+    echo "  --version [arch]  - Show current binary version for architecture (default: arm64)"
+    echo "  --help            - Show this help message"
     echo ""
     echo "Examples:"
-    echo "  $0 arm64     # Download ARM64 binary (most Android devices)"
-    echo "  $0 amd64     # Download x86_64 binary"
-    echo "  $0 --version # Check current binary version"
+    echo "  $0 arm64           # Download ARM64 binary (most Android devices)"
+    echo "  $0 arm             # Download ARM32 binary (older devices)"
+    echo "  $0 --version arm64 # Check ARM64 binary version"
+    echo "  $0 --version       # Check default (ARM64) binary version"
+    echo ""
+    echo "Output locations:"
+    echo "  arm64 → app/src/main/jniLibs/arm64-v8a/libnezha-agent.so"
+    echo "  arm   → app/src/main/jniLibs/armeabi-v7a/libnezha-agent.so"
+    echo "  amd64 → app/src/main/jniLibs/x86_64/libnezha-agent.so"
+    echo "  386   → app/src/main/jniLibs/x86/libnezha-agent.so"
     echo ""
 }
 
@@ -64,8 +90,13 @@ show_usage() {
 validate_architecture() {
     local arch="$1"
     case "$arch" in
-        arm64|amd64|arm|386|mips|mipsle|riscv64|s390x)
+        arm64|arm|amd64|386)
             return 0
+            ;;
+        mips|mipsle|riscv64|s390x)
+            print_error "Architecture '$arch' is not supported for Android JNI"
+            print_info "Supported architectures: arm64, arm, amd64, 386"
+            exit 1
             ;;
         *)
             print_error "Invalid architecture: $arch"
@@ -109,11 +140,25 @@ check_dependencies() {
 
 # Function to show current binary version
 show_current_version() {
-    local binary_path="$ASSETS_DIR/nezha-agent"
+    local arch="arm64"  # Default to arm64 for checking
+    if [ $# -gt 0 ]; then
+        arch="$1"
+    fi
+    
+    local jni_dir=$(get_jni_lib_dir "$arch")
+    local binary_path="$jni_dir/libnezha-agent.so"
     
     if [ ! -f "$binary_path" ]; then
         print_warning "No binary found at: $binary_path"
         print_info "Run './download-agent.sh <architecture>' to download a binary"
+        print_info "Available architectures with binaries:"
+        for check_arch in arm64 arm amd64 386; do
+            local check_dir=$(get_jni_lib_dir "$check_arch")
+            local check_path="$check_dir/libnezha-agent.so"
+            if [ -f "$check_path" ]; then
+                echo "  ✓ $check_arch: $check_path"
+            fi
+        done
         return 1
     fi
     
@@ -124,13 +169,9 @@ show_current_version() {
     echo "  📍 Location: $binary_path"
     echo "  📏 Size: $file_size"
     echo "  📅 Downloaded: $file_date"
+    echo "  🏗️  Architecture: $arch"
     
-    # Try to get version from the binary (if it supports --version)
-    if timeout 2s "$binary_path" --version 2>/dev/null | head -1; then
-        echo ""
-    else
-        print_info "Binary version information not available"
-    fi
+    print_info "Binary is ready for Android JNI usage"
 }
 
 # Function to get latest release info and extract tag
@@ -174,9 +215,19 @@ download_and_extract() {
     local release_tag="$2"
     local arch="$3"
     
-    # Create temp and assets directories
+    # Get the correct JNI directory for this architecture
+    local jni_dir=$(get_jni_lib_dir "$arch")
+    
+    # Validate architecture is supported
+    if [ "$jni_dir" = "app/src/main/jniLibs/unsupported" ]; then
+        print_error "Architecture '$arch' is not supported for Android JNI"
+        print_info "Supported architectures: arm64 (arm64-v8a), arm (armeabi-v7a), amd64 (x86_64), 386 (x86)"
+        exit 1
+    fi
+    
+    # Create temp and JNI directories
     mkdir -p "$TEMP_DIR"
-    mkdir -p "$ASSETS_DIR"
+    mkdir -p "$jni_dir"
     
     local zip_file="$TEMP_DIR/nezha-agent_linux_${arch}.zip"
     
@@ -205,25 +256,29 @@ download_and_extract() {
         exit 1
     fi
     
-    # Copy to assets directory
-    local final_binary="$ASSETS_DIR/nezha-agent"
+    # Copy to JNI directory with .so extension
+    local final_binary="$jni_dir/libnezha-agent.so"
     
     cp "$extracted_binary" "$final_binary"
     chmod +x "$final_binary"
     
-    print_success "Binary extracted to: $final_binary"
+    print_success "Binary installed to: $final_binary"
     
     # Show binary info
     local file_size=$(ls -lh "$final_binary" | awk '{print $5}')
+    local jni_arch_name=$(basename "$jni_dir")
+    
     print_info "Binary size: $file_size"
     print_info "Release version: $release_tag"
-    print_info "Architecture: $arch"
+    print_info "Architecture: $arch → $jni_arch_name"
+    print_info "JNI directory: $jni_dir"
     
     # Cleanup
     rm -rf "$TEMP_DIR"
     
-    print_success "Download and extraction completed successfully!"
-    print_info "You can now build your Android app with the updated binary."
+    print_success "Download and installation completed successfully!"
+    print_info "The binary is now ready to be loaded as a JNI library in your Android app."
+    print_info "You can load it in Java/Kotlin using: System.loadLibrary(\"nezha-agent\")"
 }
 
 # Main script execution
@@ -236,7 +291,8 @@ main() {
     
     # Check for version flag
     if [ "$1" = "--version" ] || [ "$1" = "-v" ]; then
-        show_current_version
+        shift  # Remove the --version flag
+        show_current_version "$@"  # Pass any remaining arguments (like architecture)
         exit 0
     fi
     

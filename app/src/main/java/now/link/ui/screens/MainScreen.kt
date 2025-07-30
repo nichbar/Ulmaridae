@@ -66,11 +66,6 @@ fun MainScreen(
         viewModel.onBatteryOptimizationExempted(context)
     }
 
-    // Initialize agent when the screen first loads
-    LaunchedEffect(Unit) {
-        viewModel.initializeAgent()
-    }
-
     // Handle toast messages
     uiState.toastMessage?.let { message ->
         LaunchedEffect(message) {

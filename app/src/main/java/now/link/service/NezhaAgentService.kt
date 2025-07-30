@@ -87,30 +87,6 @@ class NezhaAgentService : Service() {
 
         serviceJob = serviceScope.launch {
             try {
-                if (!agentManager.isAgentInstalled()) {
-                    LogManager.e(TAG, "Agent not installed, attempting to download...")
-                    withContext(Dispatchers.Main) {
-                        updateNotification(getString(R.string.downloading_agent))
-                    }
-
-                    val downloadSuccess = agentManager.extractAndInstallAgent()
-                    if (!downloadSuccess) {
-                        LogManager.e(TAG, "Failed to download agent")
-                        withContext(Dispatchers.Main) {
-                            updateNotification(getString(R.string.failed_download_agent))
-                            broadcastServiceError(
-                                Constants.Service.ERROR_AGENT_NOT_INSTALLED,
-                                getString(R.string.failed_download_binary)
-                            )
-                        }
-                        return@launch
-                    }
-
-                    LogManager.d(TAG, "Agent downloaded successfully")
-                    withContext(Dispatchers.Main) {
-                        updateNotification(getString(R.string.agent_downloaded_starting))
-                    }
-                }
                 if (!configManager.isConfigured()) {
                     LogManager.e(TAG, "Agent not configured")
                     withContext(Dispatchers.Main) {
