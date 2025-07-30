@@ -3,7 +3,7 @@
 [![Build and Release](https://github.com/nichbar/Ulmaridae/actions/workflows/build-release.yml/badge.svg)](https://github.com/nichbar/Ulmaridae/actions/workflows/build-release.yml)
 [![CI](https://github.com/nichbar/Ulmaridae/actions/workflows/ci.yml/badge.svg)](https://github.com/nichbar/Ulmaridae/actions/workflows/ci.yml)
 
-Ulmaridae is an Android wrapper application for the modified [Nezha agent](](https://github.com/nezhahq/agent)) , designed to run the agent on Android devices, even without root privileges.
+Ulmaridae is an Android wrapper application for the modified [Nezha agent](https://github.com/nezhahq/agent) , designed to run the agent on Android devices, even without root privileges.
 
 ## Installation & Configuration
 
@@ -94,7 +94,7 @@ cd Ulmaridae
 
 ## License
 
-This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 

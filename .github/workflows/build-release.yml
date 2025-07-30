@@ -117,11 +117,6 @@ jobs:
               id: release_notes
               run: |
                   RELEASE_NOTES="
-
-                  ## 🚀 **Ulmaridae ${{ steps.version.outputs.VERSION }}**
-
-                  A lightweight Android wrapper for the Nezha monitoring agent, designed to run on Android devices with or without root privileges.
-
                   ### Installation
                   1. Download the appropriate APK for your device architecture
                   2. Install the APK (enable \"Install from unknown sources\" if needed)
@@ -130,13 +125,11 @@ jobs:
                   5. Toggle the \"Enable Nezha Agent\" switch to start monitoring
 
                   ### APK Variants
-
-                  #### ARM64 (arm64) - Recommended for modern devices
-                  #### ARM (armeabi-v7a) - For older devices  
+                  - ARM64 (arm64) - Recommended for modern devices
+                  - ARM (armeabi-v7a) - For older devices  
 
                   ### Requirements
                   - Android 7.0 (API level 24) or higher
-                  - ARM or ARM64 device architecture
                   - Internet connection for server communication"
                 
                   echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
