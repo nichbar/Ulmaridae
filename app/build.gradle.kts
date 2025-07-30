@@ -52,6 +52,7 @@ android {
     lint {
         abortOnError = false
         checkReleaseBuilds = false
+        ignoreWarnings = true
         // Create a baseline for lint issues
         baseline = file("lint-baseline.xml")
     }

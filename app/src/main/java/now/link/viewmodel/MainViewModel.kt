@@ -1,5 +1,6 @@
 package now.link.viewmodel
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.content.Intent
@@ -25,6 +26,7 @@ import now.link.utils.LogManager
 import now.link.utils.RootUtils
 import now.link.utils.ServiceStatusManager
 import now.link.utils.SPUtils
+import androidx.core.net.toUri
 
 private const val TAG = "MainViewModel"
 
@@ -57,19 +59,19 @@ data class MainScreenUiState(
     val agentConfiguration: AgentConfiguration? = null,
     val isWakeLockEnabled: Boolean = false,
     val isLoggingEnabled: Boolean = false,
-    
+
     // Action states using sealed classes
     val serviceAction: ServiceAction = ServiceAction.Idle,
     val permissionState: PermissionState = PermissionState.Unknown,
     val batteryOptimizationState: BatteryOptimizationState = BatteryOptimizationState.Unknown,
-    
+
     // Dialog states
     val showConfigurationDialog: Boolean = false,
     val showWakeLockDialog: Boolean = false,
-    
+
     // Error handling
     val errorMessage: String? = null,
-    val toastMessage: String? = null
+    val toastMessage: String? = null,
 )
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -259,12 +261,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update { it.copy(batteryOptimizationState = BatteryOptimizationState.Unknown) }
     }
 
+    @SuppressLint("BatteryLife")
     fun requestBatteryOptimizationExemption(context: Context): Intent? {
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         
         return if (!powerManager.isIgnoringBatteryOptimizations(context.packageName)) {
             Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                data = Uri.parse("${Constants.Intent.PACKAGE_URI_PREFIX}${context.packageName}")
+                data = "${Constants.Intent.PACKAGE_URI_PREFIX}${context.packageName}".toUri()
             }
         } else {
             LogManager.d(TAG, "Already exempted from battery optimization")

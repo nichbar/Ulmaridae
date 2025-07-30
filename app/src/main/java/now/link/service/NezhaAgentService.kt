@@ -309,6 +309,7 @@ class NezhaAgentService : Service() {
         SPUtils.setBoolean(Constants.Service.EXTRA_SERVICE_RUNNING, isRunning)
 
         val intent = Intent(Constants.Service.ACTION_SERVICE_STATUS_CHANGED)
+        intent.setPackage(packageName)
         intent.putExtra(Constants.Service.EXTRA_SERVICE_RUNNING, isRunning)
         sendBroadcast(intent)
 
