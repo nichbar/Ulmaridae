@@ -1,11 +1,9 @@
 package now.link.ui.screens
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.os.PowerManager
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -17,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,14 +27,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.*
 import now.link.R
 import now.link.model.AgentConfiguration
-import now.link.service.NezhaAgentService
 import now.link.ui.components.ConfigurationDialog
 import now.link.ui.components.WakeLockInfoDialog
 import now.link.utils.Constants
 import now.link.utils.LogManager
-import now.link.utils.SPUtils
 import now.link.utils.ThemeManager
 import now.link.viewmodel.MainViewModel
+import now.link.viewmodel.BatteryOptimizationState
+import now.link.viewmodel.PermissionState
+import now.link.viewmodel.ServiceAction
 
 private const val TAG = "MainScreen"
 
@@ -49,29 +47,13 @@ fun MainScreen(
     onLogsClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
-
-    // Observe ViewModel state
-    val isServiceRunning by viewModel.isServiceRunning.observeAsState(false)
-    val isRootAvailable by viewModel.isRootAvailable.observeAsState(false)
-    val deviceArchitecture by viewModel.deviceArchitecture.observeAsState("")
-    val agentConfiguration by viewModel.agentConfiguration.observeAsState()
-
-    // Local state
-    var isWakeLockEnabled by remember { mutableStateOf(SPUtils.getBoolean(Constants.Preferences.WAKE_LOCK_ENABLED)) }
-    var isLoggingEnabled by remember { mutableStateOf(LogManager.isLogEnabled()) }
-    var buttonText by remember { mutableStateOf("") }
-    var showPermissionHintDialog by remember { mutableStateOf(false) }
-    var showConfigurationDialog by remember { mutableStateOf(false) }
-    var showWakeLockDialog by remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsState()
 
     // Permissions setup using Accompanist
     val requiredPermissions = buildList {
-        // Note: INTERNET is a normal permission, granted at install time
-        // Only include dangerous permissions that require runtime permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             add(Manifest.permission.POST_NOTIFICATIONS)
         }
-        // Add other dangerous permissions if needed
     }
 
     val permissionsState = rememberMultiplePermissionsState(requiredPermissions)
@@ -81,19 +63,27 @@ fun MainScreen(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         LogManager.d(TAG, "Battery optimization result: ${result.resultCode}")
+        viewModel.onBatteryOptimizationExempted(context)
     }
 
-    // Initialize logging when the screen first loads
+    // Initialize agent when the screen first loads
     LaunchedEffect(Unit) {
-        viewModel.initializeAgent(context)
+        viewModel.initializeAgent()
     }
 
-    // Update button state based on service status
-    LaunchedEffect(isServiceRunning) {
-        buttonText = if (isServiceRunning) {
-            context.getString(R.string.stop_agent)
-        } else {
-            context.getString(R.string.start_agent)
+    // Handle toast messages
+    uiState.toastMessage?.let { message ->
+        LaunchedEffect(message) {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            viewModel.clearToast()
+        }
+    }
+
+    // Handle error messages
+    uiState.errorMessage?.let { error ->
+        LaunchedEffect(error) {
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
         }
     }
 
@@ -110,64 +100,36 @@ fun MainScreen(
 
         // Status Card
         StatusCard(
-            isServiceRunning = isServiceRunning,
-            isRootAvailable = isRootAvailable,
-            deviceArchitecture = deviceArchitecture,
-            serverConfiguration = agentConfiguration?.server ?: ""
+            isServiceRunning = uiState.isServiceRunning,
+            isRootAvailable = uiState.isRootAvailable,
+            deviceArchitecture = uiState.deviceArchitecture,
+            serverConfiguration = uiState.agentConfiguration?.server ?: ""
         )
 
         // Service Control Card
         ServiceControlCard(
-            isServiceRunning = isServiceRunning,
-            buttonText = buttonText,
+            isServiceRunning = uiState.isServiceRunning,
+            isStarting = uiState.serviceAction == ServiceAction.Starting,
+            isStopping = uiState.serviceAction == ServiceAction.Stopping,
             onServiceControlClick = {
-                // Handle service control
-                if (isServiceRunning) {
-                    // Stop service
-                    val stopIntent = Intent(context, NezhaAgentService::class.java).apply {
-                        action = Constants.Service.ACTION_STOP
-                    }
-                    context.stopService(stopIntent)
+                if (uiState.isServiceRunning) {
+                    viewModel.stopService(context)
                 } else {
-                    // Start service (check configuration first)
-                    agentConfiguration?.let { config ->
-                        if (config.server.isNotEmpty() && config.secret.isNotEmpty()) {
-                            if (isBatteryOptimizationExempted(context)) {
-                                LogManager.d(TAG, "Start Nezha Agent Service")
-                                startNezhaAgentService(context, isWakeLockEnabled)
-                            } else {
-                                LogManager.d(TAG, "Show permission hint dialog")
-                                showPermissionHintDialog = true
-                            }
-                        } else {
-                            showConfigurationDialog = true
-                        }
-                    } ?: {
-                        showConfigurationDialog = true
-                    }
+                    viewModel.startService(context)
                 }
             },
-            onConfigureClick = { showConfigurationDialog = true }
+            onConfigureClick = { viewModel.showConfigurationDialog() }
         )
 
         // Advanced Settings Card
         AdvancedSettingsCard(
-            isWakeLockEnabled = isWakeLockEnabled,
-            isLoggingEnabled = isLoggingEnabled,
+            isWakeLockEnabled = uiState.isWakeLockEnabled,
+            isLoggingEnabled = uiState.isLoggingEnabled,
             onWakeLockChanged = { enabled ->
-                isWakeLockEnabled = enabled
-                // Save to preferences
-                SPUtils.setBoolean(Constants.Preferences.WAKE_LOCK_ENABLED, enabled)
-                LogManager.d(TAG, "Wake lock preference saved: $enabled")
-
-                if (enabled) {
-                    showWakeLockDialog = true
-                }
+                viewModel.updateWakeLockEnabled(enabled)
             },
             onLoggingChanged = { enabled ->
-                isLoggingEnabled = enabled
-                LogManager.setLogEnabled(enabled)
-                LogManager.i(TAG, "Logging preference changed: $enabled")
+                viewModel.updateLoggingEnabled(enabled)
             }
         )
 
@@ -195,53 +157,60 @@ fun MainScreen(
     }
 
     // Permission Dialog
-    if (showPermissionHintDialog) {
-        PermissionDialog(
+    if (uiState.permissionState == PermissionState.ShowDialog) {
+        PermissionHintDialog(
             permissionsState = permissionsState,
             onOpenSettings = {
-                showPermissionHintDialog = false
+                viewModel.dismissPermissionDialog()
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.parse("${Constants.Intent.PACKAGE_URI_PREFIX}${context.packageName}")
                 }
                 context.startActivity(intent)
             },
             onContinueAnyway = {
-                showPermissionHintDialog = false
-                LogManager.d(TAG, "User chose to continue without all permissions")
-                requestBatteryOptimizationExemption(context, batteryOptimizationLauncher)
+                viewModel.onPermissionsDenied(context)
             },
-            onDismiss = { showPermissionHintDialog = false },
+            onDismiss = { viewModel.dismissPermissionDialog() },
             onRetryPermissions = {
-                showPermissionHintDialog = false
+                viewModel.dismissPermissionDialog()
                 permissionsState.launchMultiplePermissionRequest()
             }
         )
     }
 
+    // Battery Optimization Dialog
+    if (uiState.batteryOptimizationState == BatteryOptimizationState.ShowDialog) {
+        BatteryOptimizationDialog(
+            onRequestExemption = {
+                viewModel.dismissBatteryOptimizationDialog()
+                viewModel.requestBatteryOptimizationExemption(context)?.let { intent ->
+                    batteryOptimizationLauncher.launch(intent)
+                }
+            },
+            onContinueAnyway = {
+                viewModel.onBatteryOptimizationDenied(context)
+            },
+            onDismiss = { viewModel.dismissBatteryOptimizationDialog() }
+        )
+    }
+
     // Configuration Dialog
-    if (showConfigurationDialog) {
-        val currentConfig =
-            viewModel.agentConfiguration.value ?: AgentConfiguration("", "", "", "", true)
+    if (uiState.showConfigurationDialog) {
+        val currentConfig = uiState.agentConfiguration ?: AgentConfiguration("", "", "", "", true)
 
         ConfigurationDialog(
             configuration = currentConfig,
-            onDismiss = { showConfigurationDialog = false },
+            onDismiss = { viewModel.dismissConfigurationDialog() },
             onSave = { config ->
                 viewModel.updateConfiguration(config.server, config.secret, config.uuid)
-                showConfigurationDialog = false
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.configuration_saved),
-                    Toast.LENGTH_SHORT
-                ).show()
             }
         )
     }
 
     // Wake Lock Dialog
-    if (showWakeLockDialog) {
+    if (uiState.showWakeLockDialog) {
         WakeLockInfoDialog(
-            onDismiss = { showWakeLockDialog = false }
+            onDismiss = { viewModel.dismissWakeLockDialog() }
         )
     }
 }
@@ -387,7 +356,8 @@ private fun StatusRow(
 @Composable
 private fun ServiceControlCard(
     isServiceRunning: Boolean,
-    buttonText: String,
+    isStarting: Boolean,
+    isStopping: Boolean,
     onServiceControlClick: () -> Unit,
     onConfigureClick: () -> Unit,
 ) {
@@ -414,7 +384,7 @@ private fun ServiceControlCard(
             Button(
                 onClick = onServiceControlClick,
                 modifier = Modifier.fillMaxWidth(),
-                enabled = true,
+                enabled = !isStarting && !isStopping,
                 colors = if (isServiceRunning) {
                     ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error
@@ -423,13 +393,28 @@ private fun ServiceControlCard(
                     ButtonDefaults.buttonColors()
                 }
             ) {
-                Icon(
-                    painter = painterResource(if (isServiceRunning) R.drawable.ic_stop else R.drawable.ic_play_arrow),
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
+                if (isStarting || isStopping) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(if (isServiceRunning) R.drawable.ic_stop else R.drawable.ic_play_arrow),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(buttonText)
+                Text(
+                    when {
+                        isStarting -> stringResource(id = R.string.starting_agent)
+                        isStopping -> stringResource(id = R.string.stopping_agent)
+                        isServiceRunning -> stringResource(id = R.string.stop_agent)
+                        else -> stringResource(id = R.string.start_agent)
+                    }
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -656,15 +641,13 @@ private fun ActionsCard(
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-private fun PermissionDialog(
+private fun PermissionHintDialog(
     permissionsState: MultiplePermissionsState,
     onOpenSettings: () -> Unit,
     onContinueAnyway: () -> Unit,
     onRetryPermissions: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val context = LocalContext.current
-
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -712,57 +695,29 @@ private fun PermissionDialog(
     )
 }
 
-/**
- * Start the Nezha Agent Service with the given context.
- */
-private fun startNezhaAgentService(context: Context, isWakeLockEnabled: Boolean) {
-    val startIntent =
-        Intent(context, NezhaAgentService::class.java).apply {
-            putExtra(
-                Constants.Service.EXTRA_WAKE_LOCK_ENABLED,
-                isWakeLockEnabled
-            )
-        }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        context.startForegroundService(startIntent)
-    } else {
-        context.startService(startIntent)
-    }
-}
-
-/**
- * Check if the app is exempted from battery optimization.
- */
-private fun isBatteryOptimizationExempted(context: Context): Boolean {
-    val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-
-    return powerManager.isIgnoringBatteryOptimizations(context.packageName)
-}
-
-/**
- * Request battery optimization exemption for the app.
- */
-private fun requestBatteryOptimizationExemption(
-    context: Context,
-    batteryOptimizationLauncher: androidx.activity.result.ActivityResultLauncher<Intent>,
+@Composable
+private fun BatteryOptimizationDialog(
+    onRequestExemption: () -> Unit,
+    onContinueAnyway: () -> Unit,
+    onDismiss: () -> Unit,
 ) {
-    LogManager.d(TAG, "Requesting battery optimization exemption...")
-
-    val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-
-    // Check if already exempted
-    if (powerManager.isIgnoringBatteryOptimizations(context.packageName)) {
-        LogManager.d(TAG, "Already exempted from battery optimization")
-        return
-    }
-
-    LogManager.d(TAG, "Launching battery optimization settings")
-    val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-        data = Uri.parse("${Constants.Intent.PACKAGE_URI_PREFIX}${context.packageName}")
-    }
-    try {
-        batteryOptimizationLauncher.launch(intent)
-    } catch (e: Exception) {
-        LogManager.w(TAG, "Failed to launch battery optimization settings, continuing anyway", e)
-    }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(stringResource(id = R.string.battery_optimization_title))
+        },
+        text = {
+            Text(stringResource(id = R.string.battery_optimization_message))
+        },
+        confirmButton = {
+            TextButton(onClick = onRequestExemption) {
+                Text(stringResource(id = R.string.request_exemption))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onContinueAnyway) {
+                Text(stringResource(id = R.string.continue_anyway))
+            }
+        }
+    )
 }

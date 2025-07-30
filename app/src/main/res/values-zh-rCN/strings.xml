@@ -34,6 +34,12 @@
     <string name="continue_anyway">仍然继续</string>
     <string name="retry">重试</string>
     
+    <!-- Battery Optimization -->
+    <string name="battery_optimization_title">电池优化</string>
+    <string name="battery_optimization_message">为了获得最佳性能，请为此应用禁用电池优化。这确保监控服务在后台可靠运行。</string>
+    <string name="request_exemption">打开设置</string>
+    <string name="battery_optimization_not_granted_warning">电池优化未禁用。系统可能会为了省电而终止服务。</string>
+    
     <!-- Wake Lock -->
     <string name="wake_lock_enabled">唤醒锁已启用</string>
     <string name="wake_lock_info">唤醒锁可防止设备CPU进入睡眠状态，确保持续监控。\n\n优点:\n• 防止监控中断\n• 确保实时数据报告\n• 保持稳定连接\n\n注意：这可能会增加电池消耗。唤醒锁仅在监控服务运行时激活。</string>

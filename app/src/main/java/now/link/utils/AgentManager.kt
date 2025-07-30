@@ -19,7 +19,7 @@ class AgentManager(private val context: Context) {
         agentDir.mkdirs()
     }
 
-    suspend fun downloadAndInstallAgent(): Boolean = withContext(Dispatchers.IO) {
+    suspend fun extractAndInstallAgent(): Boolean = withContext(Dispatchers.IO) {
         try {
             LogManager.d(TAG, "Installing bundled Nezha agent binary")
 

@@ -2,85 +2,349 @@ package now.link.viewmodel
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.PowerManager
+import android.provider.Settings
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import now.link.model.AgentConfiguration
+import now.link.service.NezhaAgentService
 import now.link.utils.AgentManager
 import now.link.utils.ConfigurationManager
+import now.link.utils.Constants
+import now.link.utils.LogManager
 import now.link.utils.RootUtils
 import now.link.utils.ServiceStatusManager
+import now.link.utils.SPUtils
+
+private const val TAG = "MainViewModel"
+
+// Sealed classes for specific state types
+sealed class ServiceAction {
+    object Idle : ServiceAction()
+    object Starting : ServiceAction()
+    object Stopping : ServiceAction()
+}
+
+sealed class PermissionState {
+    object Unknown : PermissionState()
+    object Granted : PermissionState()
+    object Denied : PermissionState()
+    object ShowDialog : PermissionState()
+}
+
+sealed class BatteryOptimizationState {
+    object Unknown : BatteryOptimizationState()
+    object Exempted : BatteryOptimizationState()
+    object NotExempted : BatteryOptimizationState()
+    object ShowDialog : BatteryOptimizationState()
+}
+
+// Data class for the overall UI state
+data class MainScreenUiState(
+    val isServiceRunning: Boolean = false,
+    val isRootAvailable: Boolean = false,
+    val deviceArchitecture: String = "",
+    val agentConfiguration: AgentConfiguration? = null,
+    val isWakeLockEnabled: Boolean = false,
+    val isLoggingEnabled: Boolean = false,
+    
+    // Action states using sealed classes
+    val serviceAction: ServiceAction = ServiceAction.Idle,
+    val permissionState: PermissionState = PermissionState.Unknown,
+    val batteryOptimizationState: BatteryOptimizationState = BatteryOptimizationState.Unknown,
+    
+    // Dialog states
+    val showConfigurationDialog: Boolean = false,
+    val showWakeLockDialog: Boolean = false,
+    
+    // Error handling
+    val errorMessage: String? = null,
+    val toastMessage: String? = null
+)
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val configManager = ConfigurationManager(application)
     private val agentManager = AgentManager(application)
 
-    // Use Flow for service status - automatically handles lifecycle
+    // Modern StateFlow approach instead of LiveData
+    private val _uiState = MutableStateFlow(MainScreenUiState())
+    val uiState: StateFlow<MainScreenUiState> = _uiState.asStateFlow()
+
+    // Keep LiveData for service status since it comes from ServiceStatusManager
     val isServiceRunning: LiveData<Boolean> = ServiceStatusManager
         .observeServiceStatus(application)
         .asLiveData(viewModelScope.coroutineContext)
 
-    private val _isRootAvailable = MutableLiveData<Boolean>()
-    val isRootAvailable: LiveData<Boolean> = _isRootAvailable
-
-    private val _agentConfiguration = MutableLiveData<AgentConfiguration>()
-    val agentConfiguration: LiveData<AgentConfiguration> = _agentConfiguration
-
-    private val _isAgentInstalled = MutableLiveData<Boolean>()
-
-    private val _deviceArchitecture = MutableLiveData<String>()
-    val deviceArchitecture: LiveData<String> = _deviceArchitecture
-
     init {
-        loadConfiguration()
-        checkAgentInstallation()
-        checkRootAccess()
-        loadDeviceArchitecture()
+        loadInitialState()
+        observeServiceStatus()
     }
 
-    fun initializeAgent(context: Context) {
+    private fun loadInitialState() {
         viewModelScope.launch {
-            if (!agentManager.isAgentInstalled()) {
-                val success = agentManager.downloadAndInstallAgent()
-                _isAgentInstalled.value = success
-            } else {
-                _isAgentInstalled.value = true
+            _uiState.update { state ->
+                state.copy(
+                    agentConfiguration = configManager.loadConfiguration(),
+                    isWakeLockEnabled = SPUtils.getBoolean(Constants.Preferences.WAKE_LOCK_ENABLED),
+                    isLoggingEnabled = LogManager.isLogEnabled(),
+                    deviceArchitecture = agentManager.getDeviceArchitecture(),
+                    isRootAvailable = RootUtils.isRootAvailable()
+                )
             }
         }
     }
 
-    private fun loadConfiguration() {
-        _agentConfiguration.value = configManager.loadConfiguration()
-    }
-
-    private fun checkAgentInstallation() {
-        _isAgentInstalled.value = agentManager.isAgentInstalled()
-    }
-
-    private fun checkRootAccess() {
-        viewModelScope.launch {
-            _isRootAvailable.value = RootUtils.isRootAvailable()
+    private fun observeServiceStatus() {
+        // Update UI state when service status changes
+        isServiceRunning.observeForever { isRunning ->
+            _uiState.update { it.copy(isServiceRunning = isRunning) }
         }
     }
 
-    private fun loadDeviceArchitecture() {
-        _deviceArchitecture.value = agentManager.getDeviceArchitecture()
+    fun initializeAgent() {
+        viewModelScope.launch {
+            if (!agentManager.isAgentInstalled()) {
+                val success = agentManager.extractAndInstallAgent()
+                if (!success) {
+                    _uiState.update { 
+                        it.copy(errorMessage = "Failed to extract agent binary")
+                    }
+                }
+            }
+        }
+    }
+
+    // Service control methods
+    fun startService(context: Context) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(serviceAction = ServiceAction.Starting) }
+
+            try {
+                // Check configuration first
+                val config = _uiState.value.agentConfiguration
+                if (config?.server.isNullOrEmpty() || config.secret.isEmpty()) {
+                    _uiState.update { 
+                        it.copy(
+                            serviceAction = ServiceAction.Idle,
+                            showConfigurationDialog = true
+                        ) 
+                    }
+                    return@launch
+                }
+
+                // Check permissions
+                if (!checkPermissions(context)) {
+                    _uiState.update { 
+                        it.copy(
+                            serviceAction = ServiceAction.Idle,
+                            permissionState = PermissionState.ShowDialog
+                        ) 
+                    }
+                    return@launch
+                }
+
+                // Check battery optimization
+                if (!isBatteryOptimizationExempted(context)) {
+                    _uiState.update { 
+                        it.copy(
+                            serviceAction = ServiceAction.Idle,
+                            batteryOptimizationState = BatteryOptimizationState.ShowDialog
+                        ) 
+                    }
+                    return@launch
+                }
+
+                // All checks passed, start service
+                startNezhaAgentService(context)
+            } catch (e: Exception) {
+                LogManager.e(TAG, "Failed to start service", e)
+                _uiState.update { 
+                    it.copy(
+                        serviceAction = ServiceAction.Idle,
+                        errorMessage = "Failed to start service: ${e.message}"
+                    ) 
+                }
+            }
+        }
+    }
+
+    fun stopService(context: Context) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(serviceAction = ServiceAction.Stopping) }
+            
+            try {
+                val stopIntent = Intent(context, NezhaAgentService::class.java).apply {
+                    action = Constants.Service.ACTION_STOP
+                }
+                context.stopService(stopIntent)
+                
+                _uiState.update { it.copy(serviceAction = ServiceAction.Idle) }
+            } catch (e: Exception) {
+                LogManager.e(TAG, "Failed to stop service", e)
+                _uiState.update { 
+                    it.copy(
+                        serviceAction = ServiceAction.Idle,
+                        errorMessage = "Failed to stop service: ${e.message}"
+                    ) 
+                }
+            }
+        }
+    }
+
+    private fun startNezhaAgentService(context: Context) {
+        val startIntent = Intent(context, NezhaAgentService::class.java).apply {
+            putExtra(Constants.Service.EXTRA_WAKE_LOCK_ENABLED, _uiState.value.isWakeLockEnabled)
+        }
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(startIntent)
+        } else {
+            context.startService(startIntent)
+        }
+        
+        _uiState.update { it.copy(serviceAction = ServiceAction.Idle) }
+        LogManager.d(TAG, "Nezha Agent Service started")
+    }
+
+    private fun checkPermissions(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Check POST_NOTIFICATIONS permission
+            return context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == 
+                android.content.pm.PackageManager.PERMISSION_GRANTED
+        }
+        return true // No dangerous permissions required for older versions
+    }
+
+    private fun isBatteryOptimizationExempted(context: Context): Boolean {
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        return powerManager.isIgnoringBatteryOptimizations(context.packageName)
+    }
+
+    // Permission handling
+    fun onPermissionsGranted(context: Context) {
+        _uiState.update { it.copy(permissionState = PermissionState.Granted) }
+        // Continue with service start flow
+        startService(context)
+    }
+
+    fun onPermissionsDenied(context: Context) {
+        _uiState.update { it.copy(permissionState = PermissionState.Denied) }
+        // Continue anyway but check battery optimization
+        if (!isBatteryOptimizationExempted(context)) {
+            _uiState.update { it.copy(batteryOptimizationState = BatteryOptimizationState.ShowDialog) }
+        } else {
+            startNezhaAgentService(context)
+        }
+    }
+
+    fun dismissPermissionDialog() {
+        _uiState.update { it.copy(permissionState = PermissionState.Unknown) }
+    }
+
+    // Battery optimization handling
+    fun onBatteryOptimizationExempted(context: Context) {
+        _uiState.update { it.copy(batteryOptimizationState = BatteryOptimizationState.Exempted) }
+        startNezhaAgentService(context)
+    }
+
+    fun onBatteryOptimizationDenied(context: Context) {
+        _uiState.update { 
+            it.copy(
+                batteryOptimizationState = BatteryOptimizationState.NotExempted,
+                toastMessage = "Battery optimization not disabled. The service may be killed by the system to save power."
+            ) 
+        }
+        startNezhaAgentService(context)
+    }
+
+    fun dismissBatteryOptimizationDialog() {
+        _uiState.update { it.copy(batteryOptimizationState = BatteryOptimizationState.Unknown) }
+    }
+
+    fun requestBatteryOptimizationExemption(context: Context): Intent? {
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        
+        return if (!powerManager.isIgnoringBatteryOptimizations(context.packageName)) {
+            Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                data = Uri.parse("${Constants.Intent.PACKAGE_URI_PREFIX}${context.packageName}")
+            }
+        } else {
+            LogManager.d(TAG, "Already exempted from battery optimization")
+            null
+        }
+    }
+
+    // Configuration handling
+    fun showConfigurationDialog() {
+        _uiState.update { it.copy(showConfigurationDialog = true) }
+    }
+
+    fun dismissConfigurationDialog() {
+        _uiState.update { it.copy(showConfigurationDialog = false) }
     }
 
     fun updateConfiguration(server: String, secret: String, uuid: String = "") {
         val config = AgentConfiguration(
             server = server,
             secret = secret,
-            clientId = _agentConfiguration.value?.clientId ?: "",
+            clientId = _uiState.value.agentConfiguration?.clientId ?: "",
             uuid = uuid,
-            enableTLS = _agentConfiguration.value?.enableTLS ?: true
+            enableTLS = _uiState.value.agentConfiguration?.enableTLS ?: true
         )
 
         configManager.saveConfiguration(config)
-        _agentConfiguration.value = config
+        _uiState.update { 
+            it.copy(
+                agentConfiguration = config,
+                showConfigurationDialog = false,
+                toastMessage = "Configuration saved"
+            ) 
+        }
+    }
+
+    // Settings handling
+    fun updateWakeLockEnabled(enabled: Boolean) {
+        SPUtils.setBoolean(Constants.Preferences.WAKE_LOCK_ENABLED, enabled)
+        _uiState.update { 
+            it.copy(
+                isWakeLockEnabled = enabled,
+                showWakeLockDialog = if (enabled) true else it.showWakeLockDialog
+            ) 
+        }
+        LogManager.d(TAG, "Wake lock preference saved: $enabled")
+    }
+
+    fun updateLoggingEnabled(enabled: Boolean) {
+        LogManager.setLogEnabled(enabled)
+        _uiState.update { it.copy(isLoggingEnabled = enabled) }
+        LogManager.i(TAG, "Logging preference changed: $enabled")
+    }
+
+    fun showWakeLockDialog() {
+        _uiState.update { it.copy(showWakeLockDialog = true) }
+    }
+
+    fun dismissWakeLockDialog() {
+        _uiState.update { it.copy(showWakeLockDialog = false) }
+    }
+
+    // Error and toast handling
+    fun clearError() {
+        _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    fun clearToast() {
+        _uiState.update { it.copy(toastMessage = null) }
     }
 }

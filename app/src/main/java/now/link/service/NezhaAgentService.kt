@@ -93,7 +93,7 @@ class NezhaAgentService : Service() {
                         updateNotification(getString(R.string.downloading_agent))
                     }
 
-                    val downloadSuccess = agentManager.downloadAndInstallAgent()
+                    val downloadSuccess = agentManager.extractAndInstallAgent()
                     if (!downloadSuccess) {
                         LogManager.e(TAG, "Failed to download agent")
                         withContext(Dispatchers.Main) {

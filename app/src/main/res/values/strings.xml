@@ -34,6 +34,12 @@
     <string name="continue_anyway">Continue Anyway</string>
     <string name="retry">Retry</string>
     
+    <!-- Battery Optimization -->
+    <string name="battery_optimization_title">Battery Optimization</string>
+    <string name="battery_optimization_message">For optimal performance, please disable battery optimization for this app. This ensures the monitoring service runs reliably in the background.</string>
+    <string name="request_exemption">Open Settings</string>
+    <string name="battery_optimization_not_granted_warning">Battery optimization not disabled. The service may be killed by the system to save power.</string>
+    
     <!-- Wake Lock -->
     <string name="wake_lock_enabled">Wake Lock Enabled</string>
     <string name="wake_lock_info">Wake Lock prevents your device\'s CPU from going to sleep, ensuring continuous monitoring.\n\nBenefits:\n• Prevents monitoring interruptions\n• Ensures real-time data reporting\n• Maintains stable connection\n\nNote: This may increase battery consumption. The wake lock is only active when the monitoring service is running.</string>
