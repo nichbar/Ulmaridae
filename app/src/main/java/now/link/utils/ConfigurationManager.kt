@@ -68,7 +68,7 @@ class ConfigurationManager(private val context: Context) {
                 appendLine("server: \"${config.server}\"")
                 appendLine("skip_connection_count: false")
                 appendLine("skip_procs_count: false")
-                appendLine("temperature: true")
+                appendLine("temperature: false")
                 appendLine("tls: ${config.enableTLS}")
                 appendLine("use_gitee_to_upgrade: false")
                 appendLine("use_ipv6_country_code: false")
