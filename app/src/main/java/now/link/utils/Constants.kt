@@ -16,6 +16,7 @@ object Constants {
         const val CLIENT_ID = "client_id"
         const val UUID = "uuid"
         const val ENABLE_TLS = "enable_tls"
+        const val ENABLE_COMMAND_EXECUTE = "enable_command_execute"
         
         // Theme keys
         const val DYNAMIC_COLOR_ENABLED = "dynamic_color_enabled"

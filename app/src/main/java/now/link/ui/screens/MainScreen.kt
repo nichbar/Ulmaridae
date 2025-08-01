@@ -191,13 +191,21 @@ fun MainScreen(
 
     // Configuration Dialog
     if (uiState.showConfigurationDialog) {
-        val currentConfig = uiState.agentConfiguration ?: AgentConfiguration("", "", "", "", true)
+        val currentConfig = uiState.agentConfiguration
+            ?: AgentConfiguration(
+                server = "",
+                secret = "",
+                clientId = "",
+                uuid = "",
+                enableTLS = true,
+                enableCommandExecute = false
+            )
 
         ConfigurationDialog(
             configuration = currentConfig,
             onDismiss = { viewModel.dismissConfigurationDialog() },
             onSave = { config ->
-                viewModel.updateConfiguration(config.server, config.secret, config.uuid)
+                viewModel.updateConfiguration(config)
             }
         )
     }

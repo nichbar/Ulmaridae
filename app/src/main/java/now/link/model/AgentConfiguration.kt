@@ -6,4 +6,5 @@ data class AgentConfiguration(
     val clientId: String = "",
     val uuid: String = "",
     val enableTLS: Boolean = true,
+    val enableCommandExecute: Boolean = false,
 )

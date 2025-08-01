@@ -284,15 +284,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update { it.copy(showConfigurationDialog = false) }
     }
 
-    fun updateConfiguration(server: String, secret: String, uuid: String = "") {
-        val config = AgentConfiguration(
-            server = server,
-            secret = secret,
-            clientId = _uiState.value.agentConfiguration?.clientId ?: "",
-            uuid = uuid,
-            enableTLS = _uiState.value.agentConfiguration?.enableTLS ?: true
-        )
-
+    fun updateConfiguration(config: AgentConfiguration) {
         configManager.saveConfiguration(config)
         _uiState.update { 
             it.copy(

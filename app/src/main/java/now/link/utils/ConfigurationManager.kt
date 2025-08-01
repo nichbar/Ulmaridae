@@ -18,6 +18,7 @@ class ConfigurationManager(private val context: Context) {
         SPUtils.setString(Constants.Preferences.CLIENT_ID, config.clientId)
         SPUtils.setString(Constants.Preferences.UUID, config.uuid)
         SPUtils.setBoolean(Constants.Preferences.ENABLE_TLS, config.enableTLS)
+        SPUtils.setBoolean(Constants.Preferences.ENABLE_COMMAND_EXECUTE, config.enableCommandExecute)
     }
 
     fun loadConfiguration(): AgentConfiguration {
@@ -26,7 +27,8 @@ class ConfigurationManager(private val context: Context) {
             secret = SPUtils.getString(Constants.Preferences.SECRET, "") ?: "",
             clientId = SPUtils.getString(Constants.Preferences.CLIENT_ID, "") ?: "",
             uuid = SPUtils.getString(Constants.Preferences.UUID, "") ?: "",
-            enableTLS = SPUtils.getBoolean(Constants.Preferences.ENABLE_TLS, true)
+            enableTLS = SPUtils.getBoolean(Constants.Preferences.ENABLE_TLS, true),
+            enableCommandExecute = SPUtils.getBoolean(Constants.Preferences.ENABLE_COMMAND_EXECUTE, false)
         )
     }
 
@@ -54,8 +56,8 @@ class ConfigurationManager(private val context: Context) {
                 appendLine("client_secret: \"${config.secret}\"")
                 appendLine("debug: false")
                 appendLine("disable_auto_update: true")
-                appendLine("disable_command_execute: true")
-                appendLine("disable_force_update: false")
+                appendLine("disable_command_execute: ${!config.enableCommandExecute}")
+                appendLine("disable_force_update: true")
                 appendLine("disable_nat: false")
                 appendLine("disable_send_query: false")
                 appendLine("gpu: false")
@@ -66,7 +68,7 @@ class ConfigurationManager(private val context: Context) {
                 appendLine("server: \"${config.server}\"")
                 appendLine("skip_connection_count: false")
                 appendLine("skip_procs_count: false")
-                appendLine("temperature: false")
+                appendLine("temperature: true")
                 appendLine("tls: ${config.enableTLS}")
                 appendLine("use_gitee_to_upgrade: false")
                 appendLine("use_ipv6_country_code: false")

@@ -20,6 +20,7 @@
     
     <!-- Configuration Dialog -->
     <string name="configure_nezha_agent">Configure Nezha Agent</string>
+    <string name="enable_command_execute">Enable WebSSH</string>
     <string name="configuration_dialog_description">Enter your Nezha server URL and agent secret. UUID is optional for identifying the device. These can be found in your Nezha dashboard.</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>

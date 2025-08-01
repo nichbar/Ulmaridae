@@ -24,6 +24,7 @@ fun ConfigurationDialog(
     var server by remember { mutableStateOf(configuration.server) }
     var secret by remember { mutableStateOf(configuration.secret) }
     var uuid by remember { mutableStateOf(configuration.uuid) }
+    var enableCommandExecute by remember { mutableStateOf(configuration.enableCommandExecute) }
     var passwordVisible by remember { mutableStateOf(false) }
     
     AlertDialog(
@@ -88,6 +89,27 @@ fun ConfigurationDialog(
                     )
                 )
                 
+                // Enable Command Execute Switch
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.enable_command_execute),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Switch(
+                        checked = enableCommandExecute,
+                        onCheckedChange = { enableCommandExecute = it },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.primary,
+                            checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    )
+                }
+                
                 // Description Text
                 Text(
                     text = stringResource(id = R.string.configuration_dialog_description),
@@ -107,7 +129,8 @@ fun ConfigurationDialog(
                                 secret = secret.trim(),
                                 uuid = uuid.trim(),
                                 clientId = configuration.clientId,
-                                enableTLS = configuration.enableTLS
+                                enableTLS = configuration.enableTLS,
+                                enableCommandExecute = enableCommandExecute
                             )
                         )
                     }

@@ -20,6 +20,7 @@
     
     <!-- Configuration Dialog -->
     <string name="configure_nezha_agent">配置哪吒 Agent</string>
+    <string name="enable_command_execute">启用 WebSSH</string>
     <string name="configuration_dialog_description">输入您的哪吒服务器 URL 和 Agent 密钥。UUID 是可选的，用于标识设备。这些信息可以在您的哪吒面板中找到。</string>
     <string name="save">保存</string>
     <string name="cancel">取消</string>
