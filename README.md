@@ -3,7 +3,9 @@
 [![Build and Release](https://github.com/nichbar/Ulmaridae/actions/workflows/build-release.yml/badge.svg)](https://github.com/nichbar/Ulmaridae/actions/workflows/build-release.yml)
 [![CI](https://github.com/nichbar/Ulmaridae/actions/workflows/ci.yml/badge.svg)](https://github.com/nichbar/Ulmaridae/actions/workflows/ci.yml)
 
-Ulmaridae is an Android wrapper application for the modified [Nezha agent](https://github.com/nezhahq/agent) , designed to run the agent on Android devices, even without root privileges.
+**Languages:** [English](README.md) | [简体中文](README_zh-CN.md)
+
+Ulmaridae is an Android wrapper application for the modified [Nezha agent](https://github.com/nichbar/agent) , designed to run the agent on Android devices, even without root privileges.
 
 ## Installation & Configuration
 
@@ -11,35 +13,36 @@ Ulmaridae is an Android wrapper application for the modified [Nezha agent](https
 2. Open the app on your Android device
 3. Tap "Configure" to set up your Nezha server details:
 
-   - **Server URL**: Your Nezha server URL (e.g., `your-server.com:443`)
-   - **Agent Secret**: The secret key for your agent (found in Nezha dashboard)
-   - **UUID**: Unique identifier for the agent (optional, can be auto-generated)
+    - **Server URL**: Your Nezha server URL (e.g., `your-server.com:443`)
+    - **Agent Secret**: The secret key for your agent (found in Nezha dashboard)
+    - **UUID**: Unique identifier for the agent (optional, can be auto-generated)
+
+    ⚠️ **Important**: If you plan to enable WebSSH for this agent, please read the [Security Warning](#️-security-warning-webssh-feature) first.
 
 4. Grant the necessary permissions when prompted:
-   - Root access (if available)
-   - Foreground service permission
-   - Battery optimization exemption
+
+    - Root access (if available)
+    - Foreground service permission
+    - Battery optimization exemption
 
 5. Toggle the "Enable Nezha Agent" switch to start the agent
 
-## Usage
+## ⚠️ Security Warning: WebSSH Feature
 
-### Starting the Agent
+**IMPORTANT:** If you enable the WebSSH feature in your Nezha dashboard for this agent, please be aware of the following security risks:
 
-1. Open the app
-2. Configure the server settings if not already done
-3. Toggle the "Enable Nezha Agent" switch
-4. The agent will start running in the background
+-   **Direct Device Access**: WebSSH provides terminal access to your Android device
+-   **Privilege Escalation**: On rooted devices, WebSSH may have elevated system access
+-   **Network Exposure**: WebSSH opens a remote shell accessible through your Nezha server
+-   **Data Security**: Sensitive device data and files may be accessible through the shell
 
-### Stopping the Agent
+**Recommendations:**
 
-1. Open the app
-2. Toggle off the "Enable Nezha Agent" switch
-
-Or use the notification:
-
-1. Pull down the notification panel
-2. Tap "Stop" on the Nezha Agent notification
+-   Only enable WebSSH if you absolutely need remote terminal access
+-   Ensure your Nezha server is properly secured with strong authentication
+-   Use WebSSH only on trusted networks
+-   Regularly monitor WebSSH access logs
+-   Consider disabling WebSSH when not actively needed
 
 ## Architecture
 
@@ -47,25 +50,25 @@ Or use the notification:
 
 **With Root Access:**
 
-- Agent runs with elevated privileges
-- Better system monitoring capabilities
-- More accurate hardware information
-- Can monitor system-level metrics
+-   Agent runs with elevated privileges
+-   Better system monitoring capabilities
+-   More accurate hardware information
+-   Can monitor system-level metrics
 
 **Without Root Access:**
 
-- Agent runs with standard app permissions
-- Limited but functional monitoring (app-level metrics)
-- Basic system information available
-- Network and storage monitoring works
+-   Agent runs with standard app permissions
+-   Limited but functional monitoring (app-level metrics)
+-   Basic system information available
+-   Network and storage monitoring works
 
 ## Building from Source
 
 ### Prerequisites
 
-- Android Studio or Android SDK
-- Java 17 or higher
-- Gradle 8.11.0+
+-   Android Studio or Android SDK
+-   Java 17 or higher
+-   Gradle 8.11.0+
 
 ### Build Steps
 
@@ -98,9 +101,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- [Nezha Project](https://github.com/nezhahq/agent) - The core monitoring agent
-- Android Open Source Project - For the Android framework
-- Material Design - For the UI components
+-   [Nezha Project](https://github.com/nezhahq/agent) - The core monitoring agent
+-   Android Open Source Project - For the Android framework
+-   Material Design - For the UI components
 
 ## Support
 
@@ -109,7 +112,3 @@ For issues and questions:
 1. Check the troubleshooting section above
 2. Review logs by enabling in-memory logging in the app
 3. Open an issue on the repository
-
----
-
-**Note**: This wrapper is designed for ARM AND ARM64 Android devices and has been tested on modern Android smartphones and tablets. The bundled binary is optimized for ARM and ARM64 architecture, which covers the vast majority of contemporary Android devices. Root access is optional but recommended for full functionality.
