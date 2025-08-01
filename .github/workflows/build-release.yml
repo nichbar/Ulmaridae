@@ -46,6 +46,10 @@ jobs:
                   ./download-agent.sh arm64
                   echo "Downloading ARM32 binary..."
                   ./download-agent.sh arm
+                  echo "Downloading X86_64 binary..."
+                  ./download-agent.sh amd64
+                  echo "Downloading X86 binary..."
+                  ./download-agent.sh 386
 
             - name: Build release APKs (if signed)
               if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
@@ -98,15 +102,9 @@ jobs:
               run: |
                   mkdir -p release-files
 
-                  # Copy APKs with version names
-                  if [ -f "./artifacts/app-arm64-v8a-release.apk" ]; then
-                    cp "./artifacts/app-arm64-v8a-release.apk" "release-files/Ulmaridae-${{ steps.version.outputs.VERSION }}-arm64-release.apk"
-                  fi
-
-                  if [ -f "./artifacts/app-armeabi-v7a-release.apk" ]; then
-                    cp "./artifacts/app-armeabi-v7a-release.apk" "release-files/Ulmaridae-${{ steps.version.outputs.VERSION }}-arm-release.apk"
-                  fi
-
+                  # Copy APKs
+                  find artifacts -name "*.apk" -exec cp {} release-files \;
+                
                   # List files for verification
                   echo "Downloaded artifacts:"
                   ls -la artifacts/
@@ -125,8 +123,11 @@ jobs:
                   5. Toggle the \"Enable Nezha Agent\" switch to start monitoring
 
                   ### APK Variants
-                  - ARM64 (arm64) - Recommended for modern devices
-                  - ARM (armeabi-v7a) - For older devices  
+                  - universal - Contains all architectures, suitable for most devices
+                  - arm64-v8a - Recommended for modern devices
+                  - armeabi-v7a - For older devices  
+                  - x86_64 - For 64-bit x86 devices
+                  - x86 - For 32-bit x86 devices
 
                   ### Requirements
                   - Android 7.0 (API level 24) or higher

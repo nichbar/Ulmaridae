@@ -28,8 +28,8 @@ android {
         abi {
             isEnable = true
             reset()
-            include("armeabi-v7a", "arm64-v8a")
-            isUniversalApk = false  // Set to true if you also want a universal APK
+            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            isUniversalApk = true  // Set to true if you also want a universal APK
         }
     }
 
@@ -154,6 +154,9 @@ android {
             versionNameSuffix = "-debug"
         }
     }
+    
+    // Configure base APK name
+    setProperty("archivesBaseName", "Ulmaridae")
 }
 
 dependencies {
