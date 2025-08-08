@@ -29,6 +29,7 @@ import now.link.R
 import now.link.agent.AgentType
 import now.link.agent.KomariAgentConfiguration
 import now.link.agent.NezhaAgentConfiguration
+import now.link.ui.components.AgentSelectionDialog
 import now.link.ui.components.UnifiedConfigurationDialog
 import now.link.ui.components.WakeLockInfoDialog
 import now.link.utils.Constants
@@ -123,11 +124,15 @@ fun MainScreen(
         AdvancedSettingsCard(
             isWakeLockEnabled = uiState.isWakeLockEnabled,
             isLoggingEnabled = uiState.isLoggingEnabled,
+            currentAgentType = uiState.currentAgentType,
             onWakeLockChanged = { enabled ->
                 viewModel.updateWakeLockEnabled(enabled)
             },
             onLoggingChanged = { enabled ->
                 viewModel.updateLoggingEnabled(enabled)
+            },
+            onAgentTypeChanged = { agentType ->
+                viewModel.switchAgent(context, agentType)
             }
         )
 
@@ -202,13 +207,9 @@ fun MainScreen(
         UnifiedConfigurationDialog(
             currentAgentType = uiState.currentAgentType,
             configuration = currentConfig,
-            availableAgentTypes = uiState.availableAgentTypes,
             onDismiss = { viewModel.dismissConfigurationDialog() },
             onSave = { agentType, config ->
                 viewModel.updateConfiguration(agentType, config)
-            },
-            onAgentTypeChanged = { agentType ->
-                viewModel.changeAgentType(agentType)
             }
         )
     }
@@ -217,6 +218,16 @@ fun MainScreen(
     if (uiState.showWakeLockDialog) {
         WakeLockInfoDialog(
             onDismiss = { viewModel.dismissWakeLockDialog() }
+        )
+    }
+
+    // Agent Selection Dialog
+    if (uiState.showAgentSelectionDialog) {
+        AgentSelectionDialog(
+            onAgentSelected = { agentType ->
+                viewModel.selectAgent(agentType)
+            },
+            onDismiss = { viewModel.dismissAgentSelectionDialog() }
         )
     }
 }
@@ -441,8 +452,10 @@ private fun ServiceControlCard(
 private fun AdvancedSettingsCard(
     isWakeLockEnabled: Boolean,
     isLoggingEnabled: Boolean,
+    currentAgentType: AgentType,
     onWakeLockChanged: (Boolean) -> Unit,
     onLoggingChanged: (Boolean) -> Unit,
+    onAgentTypeChanged: (AgentType) -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -480,6 +493,11 @@ private fun AdvancedSettingsCard(
                 isEnabled = isLoggingEnabled,
                 onToggle = onLoggingChanged
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Agent Switch Row
+            AgentSwitchRow(currentAgentType, onAgentTypeChanged)
         }
     }
 }
@@ -727,4 +745,46 @@ private fun BatteryOptimizationDialog(
             }
         }
     )
+}
+
+@Composable
+private fun AgentSwitchRow(
+    currentAgentType: AgentType,
+    onAgentTypeChanged: (AgentType) -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = stringResource(id = R.string.switch_agent),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Segmented button for agent selection
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            AgentType.entries.forEachIndexed { index, agentType ->
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(
+                        index = index,
+                        count = AgentType.entries.size
+                    ),
+                    onClick = { onAgentTypeChanged(agentType) },
+                    selected = currentAgentType == agentType
+                ) {
+                    Text(
+                        text = when (agentType) {
+                            AgentType.NEZHA_AGENT -> stringResource(R.string.nezha_agent_name)
+                            AgentType.KOMARI_AGENT -> stringResource(R.string.komari_agent_name)
+                        },
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+        }
+    }
 }

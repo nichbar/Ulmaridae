@@ -1,7 +1,6 @@
 package now.link.agent
 
 import android.content.Context
-import android.util.Log
 import java.io.File
 
 /**
@@ -15,14 +14,14 @@ class KomariAgentManager : BaseAgentManager() {
         private const val TAG = "KomariAgentManager"
     }
     
-    override fun createCommand(context: Context, configuration: AgentConfiguration): List<String> {
+    override fun createCommand(context: Context, configuration: AgentConfiguration, hasRoot: Boolean): List<String> {
         require(configuration is KomariAgentConfiguration) {
             "KomariAgentManager requires KomariAgentConfiguration"
         }
         
         val agentPath = getAgentPath(context)
-        val commandArgs = configuration.toCommandArgs()
-        
+        val commandArgs = configuration.toCommandArgs(hasRoot)
+
         return listOf(agentPath) + commandArgs
     }
     

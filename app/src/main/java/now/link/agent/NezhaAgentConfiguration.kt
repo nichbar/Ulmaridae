@@ -14,7 +14,7 @@ data class NezhaAgentConfiguration(
     override val enableCommandExecute: Boolean = false,
 ) : AgentConfiguration {
     
-    override fun toCommandArgs(): List<String> {
+    override fun toCommandArgs(hasRoot: Boolean): List<String> {
         // Nezha agent typically uses config file, not command line args
         return emptyList()
     }

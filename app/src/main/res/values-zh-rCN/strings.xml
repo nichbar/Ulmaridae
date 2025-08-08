@@ -26,14 +26,19 @@
     <string name="komari_agent_name">Komari Agent</string>
     <string name="enable_command_execute">启用 WebSSH</string>
     <string name="nezha_configuration_description">输入您的哪吒服务器 URL 和 Agent 密钥。UUID 是可选的，用于标识设备。这些信息可以在您的哪吒面板中找到。</string>
-    <string name="komari_configuration_description">输入您的 Komari 端点和令牌。间隔和超时是监控频率和连接超时的可选设置。</string>
+    <string name="komari_configuration_description">输入您的 Komari 地址和 token</string>
     <string name="server_url">服务器 URL</string>
     <string name="client_secret">客户端密钥</string>
     <string name="uuid">UUID（可选）</string>
-    <string name="endpoint">端点</string>
-    <string name="token">令牌</string>
+    <string name="endpoint">地址</string>
+    <string name="token">token</string>
     <string name="interval">间隔（秒）</string>
     <string name="timeout">超时（秒）</string>
+    
+    <!-- Agent Selection Dialog -->
+    <string name="choose_monitoring_agent">选择你的 Agent</string>
+    <string name="continue_with_selection">继续</string>
+    <string name="switch_agent">切换 Agent</string>
     <string name="save">保存</string>
     <string name="cancel">取消</string>
     <string name="configuration_saved">配置已保存</string>
@@ -88,7 +93,7 @@
     <!-- Error Messages -->
     <string name="agent_config_incomplete">Agent 配置不完整。请配置 Agent。</string>
     <string name="nezha_agent_config_incomplete">哪吒 Agent 配置不完整。请配置服务器和密钥。</string>
-    <string name="komari_agent_config_incomplete">Komari Agent 配置不完整。请配置端点和令牌。</string>
+    <string name="komari_agent_config_incomplete">Komari Agent 配置不完整。请配置地址和 token。</string>
     <string name="failed_download_binary">下载 Agent 二进制文件失败</string>
     <string name="failed_create_config_file">创建配置文件失败</string>
     <string name="failed_start_agent">启动 Agent 失败: %s</string>

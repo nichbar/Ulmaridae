@@ -22,7 +22,7 @@ interface AgentManager {
     /**
      * Creates the command to execute the agent
      */
-    fun createCommand(context: Context, configuration: AgentConfiguration): List<String>
+    fun createCommand(context: Context, configuration: AgentConfiguration, hasRoot: Boolean): List<String>
     
     /**
      * Creates configuration file if needed

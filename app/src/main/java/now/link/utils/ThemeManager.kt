@@ -11,7 +11,7 @@ import androidx.compose.runtime.setValue
 object ThemeManager {
     
     // Internal mutable states
-    private var _isDynamicColorEnabled by mutableStateOf(SPUtils.getBoolean(Constants.Preferences.DYNAMIC_COLOR_ENABLED, true))
+    private var _isDynamicColorEnabled by mutableStateOf(SPUtils.getBoolean(Constants.Preferences.DYNAMIC_COLOR_ENABLED, false))
     private var _isFollowSystemTheme by mutableStateOf(SPUtils.getBoolean(Constants.Preferences.FOLLOW_SYSTEM_THEME, true))
     private var _isDarkModeEnabled by mutableStateOf(SPUtils.getBoolean(Constants.Preferences.DARK_MODE_ENABLED, false))
     
@@ -24,7 +24,7 @@ object ThemeManager {
      * Initialize theme manager - call this on app startup to ensure states are loaded
      */
     fun initialize() {
-        _isDynamicColorEnabled = SPUtils.getBoolean(Constants.Preferences.DYNAMIC_COLOR_ENABLED, true)
+        _isDynamicColorEnabled = SPUtils.getBoolean(Constants.Preferences.DYNAMIC_COLOR_ENABLED, false)
         _isFollowSystemTheme = SPUtils.getBoolean(Constants.Preferences.FOLLOW_SYSTEM_THEME, true)
         _isDarkModeEnabled = SPUtils.getBoolean(Constants.Preferences.DARK_MODE_ENABLED, false)
     }

@@ -26,7 +26,7 @@
     <string name="komari_agent_name">Komari Agent</string>
     <string name="enable_command_execute">Enable WebSSH</string>
     <string name="nezha_configuration_description">Enter your Nezha server URL and agent secret. UUID is optional for identifying the device. These can be found in your Nezha dashboard.</string>
-    <string name="komari_configuration_description">Enter your Komari endpoint and token. Interval and timeout are optional settings for monitoring frequency and connection timeout.</string>
+    <string name="komari_configuration_description">Enter your Komari endpoint and token.</string>
     <string name="server_url">Server URL</string>
     <string name="client_secret">Client Secret</string>
     <string name="uuid">UUID (Optional)</string>
@@ -34,6 +34,11 @@
     <string name="token">Token</string>
     <string name="interval">Interval (seconds)</string>
     <string name="timeout">Timeout (seconds)</string>
+    
+    <!-- Agent Selection Dialog -->
+    <string name="choose_monitoring_agent">Choose your Agent</string>
+    <string name="continue_with_selection">Continue</string>
+    <string name="switch_agent">Switch Agent</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="configuration_saved">Configuration saved</string>

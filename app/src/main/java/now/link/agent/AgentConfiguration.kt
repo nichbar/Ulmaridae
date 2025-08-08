@@ -18,7 +18,7 @@ interface AgentConfiguration {
     /**
      * Converts configuration to command line arguments
      */
-    fun toCommandArgs(): List<String>
+    fun toCommandArgs(hasRoot: Boolean): List<String>
     
     /**
      * Converts configuration to config file content

@@ -11,7 +11,7 @@ data class KomariAgentConfiguration(
     override val enableCommandExecute: Boolean = false,
 ) : AgentConfiguration {
     
-    override fun toCommandArgs(): List<String> {
+    override fun toCommandArgs(hasRoot: Boolean): List<String> {
         val args = mutableListOf<String>()
         
         // Required arguments
@@ -26,7 +26,14 @@ data class KomariAgentConfiguration(
         if (!enableCommandExecute) {
             args.add("--disable-web-ssh")
         }
-        
+
+        // ignore auto-update
+        args.add("--disable-auto-update")
+
+        args.addAll(listOf("--is-android", "true"))
+
+        args.addAll(listOf("--has-root-privilege", hasRoot.toString()))
+
         return args
     }
     

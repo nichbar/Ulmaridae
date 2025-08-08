@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
@@ -72,6 +71,7 @@ data class MainScreenUiState(
     // Dialog states
     val showConfigurationDialog: Boolean = false,
     val showWakeLockDialog: Boolean = false,
+    val showAgentSelectionDialog: Boolean = false,
 
     // Error handling
     val errorMessage: String? = null,
@@ -95,6 +95,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     init {
         loadInitialState()
         observeServiceStatus()
+        checkFirstLaunch()
     }
 
     private fun loadInitialState() {
@@ -342,6 +343,49 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun dismissWakeLockDialog() {
         _uiState.update { it.copy(showWakeLockDialog = false) }
+    }
+
+    // Agent selection methods
+    fun checkFirstLaunch() {
+        val isFirstLaunch = SPUtils.getBoolean(Constants.Preferences.FIRST_LAUNCH, true)
+        if (isFirstLaunch) {
+            _uiState.update { it.copy(showAgentSelectionDialog = true) }
+        }
+    }
+
+    fun selectAgent(agentType: AgentType) {
+        configManager.setCurrentAgentType(agentType)
+        SPUtils.setBoolean(Constants.Preferences.FIRST_LAUNCH, false)
+        _uiState.update { 
+            it.copy(
+                currentAgentType = agentType,
+                showAgentSelectionDialog = false,
+                agentConfiguration = configManager.loadConfiguration()
+            ) 
+        }
+        LogManager.i(TAG, "Agent type selected: $agentType")
+    }
+
+    fun switchAgent(context: Context, agentType: AgentType) {
+        // Stop the current service before switching
+        stopService(context)
+
+        configManager.setCurrentAgentType(agentType)
+        _uiState.update { 
+            it.copy(
+                currentAgentType = agentType,
+                agentConfiguration = configManager.loadConfiguration()
+            ) 
+        }
+        LogManager.i(TAG, "Agent type switched to: $agentType")
+    }
+
+    fun showAgentSelectionDialog() {
+        _uiState.update { it.copy(showAgentSelectionDialog = true) }
+    }
+
+    fun dismissAgentSelectionDialog() {
+        _uiState.update { it.copy(showAgentSelectionDialog = false) }
     }
 
     // Error and toast handling

@@ -15,7 +15,7 @@ class NezhaAgentManager : BaseAgentManager() {
         private const val TAG = "NezhaAgentManager"
     }
     
-    override fun createCommand(context: Context, configuration: AgentConfiguration): List<String> {
+    override fun createCommand(context: Context, configuration: AgentConfiguration, hasRoot: Boolean): List<String> {
         require(configuration is NezhaAgentConfiguration) {
             "NezhaAgentManager requires NezhaAgentConfiguration"
         }

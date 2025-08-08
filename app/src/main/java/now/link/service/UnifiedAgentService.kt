@@ -103,9 +103,13 @@ class UnifiedAgentService : Service() {
                 
                 LogManager.d(TAG, "Starting ${agentManager.agentType.displayName}")
 
+                // Try to run with root if available, otherwise run normally
+                val hasRoot = RootUtils.isRootAvailable()
+                LogManager.d(TAG, "Root access: $hasRoot")
+
                 // Create command
                 val command = try {
-                    agentManager.createCommand(this@UnifiedAgentService, configuration)
+                    agentManager.createCommand(this@UnifiedAgentService, configuration, hasRoot)
                 } catch (e: Exception) {
                     LogManager.e(TAG, "Failed to create command", e)
                     withContext(Dispatchers.Main) {
@@ -119,10 +123,6 @@ class UnifiedAgentService : Service() {
                 }
 
                 LogManager.d(TAG, "Starting agent with command: ${command.joinToString(" ")}")
-
-                // Try to run with root if available, otherwise run normally
-                val hasRoot = RootUtils.isRootAvailable()
-                LogManager.d(TAG, "Root access: $hasRoot")
 
                 startAgentProcess(command, hasRoot)
             } catch (e: CancellationException) {

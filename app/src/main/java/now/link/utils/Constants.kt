@@ -9,6 +9,7 @@ object Constants {
     object Preferences {
         const val PREFS_NAME = "ulmaridae_settings"
         const val WAKE_LOCK_ENABLED = "wake_lock_enabled"
+        const val FIRST_LAUNCH = "first_launch"
         
         // Configuration keys
         const val SERVER = "server"

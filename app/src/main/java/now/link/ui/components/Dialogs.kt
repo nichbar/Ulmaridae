@@ -18,18 +18,147 @@ import now.link.R
 import now.link.agent.AgentType
 import now.link.agent.KomariAgentConfiguration
 import now.link.agent.NezhaAgentConfiguration
-import kotlin.collections.forEach
+import now.link.model.AgentConfiguration
+
+@Composable
+fun ConfigurationDialog(
+    configuration: AgentConfiguration,
+    onDismiss: () -> Unit,
+    onSave: (AgentConfiguration) -> Unit
+) {
+    var server by remember { mutableStateOf(configuration.server) }
+    var secret by remember { mutableStateOf(configuration.secret) }
+    var uuid by remember { mutableStateOf(configuration.uuid) }
+    var enableCommandExecute by remember { mutableStateOf(configuration.enableCommandExecute) }
+    var passwordVisible by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(stringResource(id = R.string.configure_nezha_agent))
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Server URL Field
+                OutlinedTextField(
+                    value = server,
+                    onValueChange = { server = it },
+                    label = { Text("Server URL") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+
+                // Agent Secret Field
+                OutlinedTextField(
+                    value = secret,
+                    onValueChange = { secret = it },
+                    label = { Text("Agent Secret") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                painter = painterResource(
+                                    id = if (passwordVisible) R.drawable.ic_visibility_off else R.drawable.ic_visibility
+                                ),
+                                contentDescription = null
+                            )
+                        }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+
+                // UUID Field
+                OutlinedTextField(
+                    value = uuid,
+                    onValueChange = { uuid = it },
+                    label = { Text("UUID (Optional)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+
+                // Enable Command Execute Switch
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.enable_command_execute),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Switch(
+                        checked = enableCommandExecute,
+                        onCheckedChange = { enableCommandExecute = it },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.primary,
+                            checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    )
+                }
+
+                // Description Text
+                Text(
+                    text = stringResource(id = R.string.nezha_configuration_description),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (server.isNotBlank() && secret.isNotBlank()) {
+                        onSave(
+                            AgentConfiguration(
+                                server = server.trim(),
+                                secret = secret.trim(),
+                                uuid = uuid.trim(),
+                                clientId = configuration.clientId,
+                                enableTLS = configuration.enableTLS,
+                                enableCommandExecute = enableCommandExecute
+                            )
+                        )
+                    }
+                }
+            ) {
+                Text(stringResource(id = R.string.save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(id = R.string.cancel))
+            }
+        }
+    )
+}
 
 @Composable
 fun UnifiedConfigurationDialog(
     currentAgentType: AgentType,
     configuration: now.link.agent.AgentConfiguration,
-    availableAgentTypes: List<AgentType>,
     onDismiss: () -> Unit,
     onSave: (AgentType, now.link.agent.AgentConfiguration) -> Unit,
-    onAgentTypeChanged: (AgentType) -> Unit
 ) {
-    var selectedAgentType by remember { mutableStateOf(currentAgentType) }
     var passwordVisible by remember { mutableStateOf(false) }
 
     // Common fields
@@ -41,7 +170,10 @@ fun UnifiedConfigurationDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("Configure Monitoring Agent")
+            when (currentAgentType) {
+                AgentType.NEZHA_AGENT -> Text(stringResource(id = R.string.configure_nezha_agent))
+                AgentType.KOMARI_AGENT -> Text(stringResource(id = R.string.configure_komari_agent))
+            }
         },
         text = {
             Column(
@@ -50,36 +182,7 @@ fun UnifiedConfigurationDialog(
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Agent Type Selection
-                if (availableAgentTypes.size > 1) {
-                    Text(
-                        text = "Agent Type",
-                        style = MaterialTheme.typography.titleSmall
-                    )
-
-                    availableAgentTypes.forEach { agentType ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = agentType.displayName,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            RadioButton(
-                                selected = selectedAgentType == agentType,
-                                onClick = {
-                                    selectedAgentType = agentType
-                                    onAgentTypeChanged(agentType)
-                                }
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-
-                // Common Fields
+                // Server URL Field
                 OutlinedTextField(
                     value = server,
                     onValueChange = { server = it },
@@ -87,12 +190,10 @@ fun UnifiedConfigurationDialog(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-                    supportingText = {
-                        when (selectedAgentType) {
-                            AgentType.NEZHA_AGENT -> Text("e.g., your-server.com:443")
-                            AgentType.KOMARI_AGENT -> Text("e.g., https://your-server.com")
-                        }
-                    }
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary
+                    )
                 )
 
                 OutlinedTextField(
@@ -100,7 +201,7 @@ fun UnifiedConfigurationDialog(
                     onValueChange = { secret = it },
                     label = {
                         Text(
-                            when (selectedAgentType) {
+                            when (currentAgentType) {
                                 AgentType.NEZHA_AGENT -> "Agent Secret"
                                 AgentType.KOMARI_AGENT -> "Token"
                             }
@@ -118,44 +219,58 @@ fun UnifiedConfigurationDialog(
                                 contentDescription = if (passwordVisible) "Hide password" else "Show password"
                             )
                         }
-                    }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary
+                    )
                 )
 
-                OutlinedTextField(
-                    value = uuid,
-                    onValueChange = { uuid = it },
-                    label = { Text("UUID (Optional)") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    supportingText = { Text("Leave empty to auto-generate") }
-                )
+                if (currentAgentType == AgentType.NEZHA_AGENT) {
+                    OutlinedTextField(
+                        value = uuid,
+                        onValueChange = { uuid = it },
+                        label = { Text("UUID (Optional)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary
+                        )
+                    )
+                }
 
                 // Command Execute Toggle
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                 ) {
                     Text(
-                        text = when (selectedAgentType) {
-                            AgentType.NEZHA_AGENT -> stringResource(id = R.string.enable_command_execute)
-                            AgentType.KOMARI_AGENT -> "Enable Web SSH"
-                        },
-                        style = MaterialTheme.typography.bodyMedium
+                        text = stringResource(id = R.string.enable_command_execute),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Switch(
                         checked = enableCommandExecute,
-                        onCheckedChange = { enableCommandExecute = it }
+                        onCheckedChange = { enableCommandExecute = it },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.primary,
+                            checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
+                        )
                     )
                 }
 
                 // Description
                 Text(
-                    text = when (selectedAgentType) {
+                    text = when (currentAgentType) {
                         AgentType.NEZHA_AGENT -> stringResource(id = R.string.nezha_configuration_description)
                         AgentType.KOMARI_AGENT -> stringResource(id = R.string.komari_configuration_description)
                     },
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp)
                 )
             }
         },
@@ -163,7 +278,7 @@ fun UnifiedConfigurationDialog(
             TextButton(
                 onClick = {
                     if (server.isNotBlank() && secret.isNotBlank()) {
-                        val newConfiguration = when (selectedAgentType) {
+                        val newConfiguration = when (currentAgentType) {
                             AgentType.NEZHA_AGENT -> NezhaAgentConfiguration(
                                 server = server,
                                 secret = secret,
@@ -179,7 +294,7 @@ fun UnifiedConfigurationDialog(
                                 enableCommandExecute = enableCommandExecute,
                             )
                         }
-                        onSave(selectedAgentType, newConfiguration)
+                        onSave(currentAgentType, newConfiguration)
                     }
                 }
             ) {
