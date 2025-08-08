@@ -71,6 +71,21 @@ object SPUtils {
     }
 
     @JvmStatic
+    fun setFloat(key: String, value: Float) {
+        sp.edit().putFloat(key, value).apply()
+    }
+
+    @JvmStatic
+    fun getFloat(key: String): Float {
+        return sp.getFloat(key, 0.0f)
+    }
+
+    @JvmStatic
+    fun getFloat(key: String, defaultValue: Float): Float {
+        return sp.getFloat(key, defaultValue)
+    }
+
+    @JvmStatic
     fun getBooleanWithContext(context: Context, key: String, defaultValue: Boolean): Boolean {
         return context.getSharedPreferences("Halo", Context.MODE_PRIVATE)
             .getBoolean(key, defaultValue)

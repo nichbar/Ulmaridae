@@ -35,10 +35,10 @@
 
 # Keep TileService classes (for Quick Settings Tile)
 -keep public class * extends android.service.quicksettings.TileService
--keep class now.link.service.NezhaAgentTileService { *; }
+-keep class now.link.service.UnifiedAgentTileService { *; }
 
 # Keep Service classes
--keep class now.link.service.NezhaAgentService { *; }
+-keep class now.link.service.UnifiedAgentService { *; }
 
 # Keep ViewModels
 -keep class now.link.viewmodel.** { *; }

@@ -17,10 +17,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import now.link.model.AgentConfiguration
-import now.link.service.NezhaAgentService
-import now.link.utils.AgentManager
-import now.link.utils.ConfigurationManager
+import now.link.agent.AgentConfiguration
+import now.link.agent.AgentType
+import now.link.agent.UnifiedConfigurationManager
+import now.link.service.UnifiedAgentService
+import now.link.utils.UnifiedAgentManager
 import now.link.utils.Constants
 import now.link.utils.LogManager
 import now.link.utils.RootUtils
@@ -57,6 +58,9 @@ data class MainScreenUiState(
     val isRootAvailable: Boolean = false,
     val deviceArchitecture: String = "",
     val agentConfiguration: AgentConfiguration? = null,
+    val currentAgentType: AgentType = AgentType.NEZHA_AGENT,
+    val availableAgentTypes: List<AgentType> = emptyList(),
+    val installedAgentTypes: List<AgentType> = emptyList(),
     val isWakeLockEnabled: Boolean = false,
     val isLoggingEnabled: Boolean = false,
 
@@ -76,8 +80,8 @@ data class MainScreenUiState(
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val configManager = ConfigurationManager(application)
-    private val agentManager = AgentManager(application)
+    private val configManager = UnifiedConfigurationManager(application)
+    private val agentManager = UnifiedAgentManager(application)
 
     // Modern StateFlow approach instead of LiveData
     private val _uiState = MutableStateFlow(MainScreenUiState())
@@ -98,6 +102,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _uiState.update { state ->
                 state.copy(
                     agentConfiguration = configManager.loadConfiguration(),
+                    currentAgentType = configManager.getCurrentAgentType(),
+                    availableAgentTypes = agentManager.getAvailableAgentTypes(),
+                    installedAgentTypes = agentManager.findInstalledAgents(),
                     isWakeLockEnabled = SPUtils.getBoolean(Constants.Preferences.WAKE_LOCK_ENABLED),
                     isLoggingEnabled = LogManager.isLogEnabled(),
                     deviceArchitecture = agentManager.getDeviceArchitecture(),
@@ -155,7 +162,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 // All checks passed, start service
-                startNezhaAgentService(context)
+                startUnifiedAgentService(context)
             } catch (e: Exception) {
                 LogManager.e(TAG, "Failed to start service", e)
                 _uiState.update { 
@@ -173,7 +180,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _uiState.update { it.copy(serviceAction = ServiceAction.Stopping) }
             
             try {
-                val stopIntent = Intent(context, NezhaAgentService::class.java).apply {
+                val stopIntent = Intent(context, UnifiedAgentService::class.java).apply {
                     action = Constants.Service.ACTION_STOP
                 }
                 context.stopService(stopIntent)
@@ -191,8 +198,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun startNezhaAgentService(context: Context) {
-        val startIntent = Intent(context, NezhaAgentService::class.java).apply {
+    private fun startUnifiedAgentService(context: Context) {
+        val startIntent = Intent(context, UnifiedAgentService::class.java).apply {
             putExtra(Constants.Service.EXTRA_WAKE_LOCK_ENABLED, _uiState.value.isWakeLockEnabled)
         }
         
@@ -203,7 +210,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
         
         _uiState.update { it.copy(serviceAction = ServiceAction.Idle) }
-        LogManager.d(TAG, "Nezha Agent Service started")
+        LogManager.d(TAG, "Unified Agent Service started")
     }
 
     private fun checkPermissions(context: Context): Boolean {
@@ -233,7 +240,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (!isBatteryOptimizationExempted(context)) {
             _uiState.update { it.copy(batteryOptimizationState = BatteryOptimizationState.ShowDialog) }
         } else {
-            startNezhaAgentService(context)
+            startUnifiedAgentService(context)
         }
     }
 
@@ -244,7 +251,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // Battery optimization handling
     fun onBatteryOptimizationExempted(context: Context) {
         _uiState.update { it.copy(batteryOptimizationState = BatteryOptimizationState.Exempted) }
-        startNezhaAgentService(context)
+        startUnifiedAgentService(context)
     }
 
     fun onBatteryOptimizationDenied(context: Context) {
@@ -254,7 +261,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 toastMessage = "Battery optimization not disabled. The service may be killed by the system to save power."
             ) 
         }
-        startNezhaAgentService(context)
+        startUnifiedAgentService(context)
     }
 
     fun dismissBatteryOptimizationDialog() {
@@ -284,13 +291,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update { it.copy(showConfigurationDialog = false) }
     }
 
-    fun updateConfiguration(config: AgentConfiguration) {
+    fun updateConfiguration(agentType: AgentType, config: AgentConfiguration) {
+        // Update agent type if changed
+        if (agentType != configManager.getCurrentAgentType()) {
+            configManager.setCurrentAgentType(agentType)
+        }
+        
         configManager.saveConfiguration(config)
         _uiState.update { 
             it.copy(
                 agentConfiguration = config,
+                currentAgentType = agentType,
                 showConfigurationDialog = false,
                 toastMessage = "Configuration saved"
+            ) 
+        }
+    }
+
+    fun changeAgentType(agentType: AgentType) {
+        configManager.setCurrentAgentType(agentType)
+        _uiState.update { 
+            it.copy(
+                currentAgentType = agentType,
+                agentConfiguration = configManager.loadConfiguration()
             ) 
         }
     }

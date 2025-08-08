@@ -26,8 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.*
 import now.link.R
-import now.link.model.AgentConfiguration
-import now.link.ui.components.ConfigurationDialog
+import now.link.agent.AgentType
+import now.link.agent.KomariAgentConfiguration
+import now.link.agent.NezhaAgentConfiguration
+import now.link.ui.components.UnifiedConfigurationDialog
 import now.link.ui.components.WakeLockInfoDialog
 import now.link.utils.Constants
 import now.link.utils.LogManager
@@ -106,6 +108,7 @@ fun MainScreen(
             isServiceRunning = uiState.isServiceRunning,
             isStarting = uiState.serviceAction == ServiceAction.Starting,
             isStopping = uiState.serviceAction == ServiceAction.Stopping,
+            currentAgentType = uiState.currentAgentType,
             onServiceControlClick = {
                 if (uiState.isServiceRunning) {
                     viewModel.stopService(context)
@@ -191,21 +194,21 @@ fun MainScreen(
 
     // Configuration Dialog
     if (uiState.showConfigurationDialog) {
-        val currentConfig = uiState.agentConfiguration
-            ?: AgentConfiguration(
-                server = "",
-                secret = "",
-                clientId = "",
-                uuid = "",
-                enableTLS = true,
-                enableCommandExecute = false
-            )
+        val currentConfig = uiState.agentConfiguration ?: when (uiState.currentAgentType) {
+            AgentType.NEZHA_AGENT -> NezhaAgentConfiguration()
+            AgentType.KOMARI_AGENT -> KomariAgentConfiguration()
+        }
 
-        ConfigurationDialog(
+        UnifiedConfigurationDialog(
+            currentAgentType = uiState.currentAgentType,
             configuration = currentConfig,
+            availableAgentTypes = uiState.availableAgentTypes,
             onDismiss = { viewModel.dismissConfigurationDialog() },
-            onSave = { config ->
-                viewModel.updateConfiguration(config)
+            onSave = { agentType, config ->
+                viewModel.updateConfiguration(agentType, config)
+            },
+            onAgentTypeChanged = { agentType ->
+                viewModel.changeAgentType(agentType)
             }
         )
     }
@@ -361,6 +364,7 @@ private fun ServiceControlCard(
     isServiceRunning: Boolean,
     isStarting: Boolean,
     isStopping: Boolean,
+    currentAgentType: AgentType,
     onServiceControlClick: () -> Unit,
     onConfigureClick: () -> Unit,
 ) {
@@ -376,7 +380,7 @@ private fun ServiceControlCard(
                 .padding(20.dp)
         ) {
             Text(
-                text = stringResource(id = R.string.nezha_agent_title),
+                text = currentAgentType.displayName,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )

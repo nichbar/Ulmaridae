@@ -2,7 +2,6 @@
     <string name="app_name">Ulmaridae</string>
     
     <!-- Main Activity -->
-    <string name="agent_running">Agent 运行中</string>
     <string name="agent_stopped">Agent 已停止</string>
     <string name="root_available">可用</string>
     <string name="root_not_available">不可用</string>
@@ -19,9 +18,22 @@
     <string name="configuring">配置中…</string>
     
     <!-- Configuration Dialog -->
+    <string name="configure_agent">配置 Agent</string>
     <string name="configure_nezha_agent">配置哪吒 Agent</string>
+    <string name="configure_komari_agent">配置 Komari Agent</string>
+    <string name="agent_type">Agent 类型</string>
+    <string name="nezha_agent_name">哪吒 Agent</string>
+    <string name="komari_agent_name">Komari Agent</string>
     <string name="enable_command_execute">启用 WebSSH</string>
-    <string name="configuration_dialog_description">输入您的哪吒服务器 URL 和 Agent 密钥。UUID 是可选的，用于标识设备。这些信息可以在您的哪吒面板中找到。</string>
+    <string name="nezha_configuration_description">输入您的哪吒服务器 URL 和 Agent 密钥。UUID 是可选的，用于标识设备。这些信息可以在您的哪吒面板中找到。</string>
+    <string name="komari_configuration_description">输入您的 Komari 端点和令牌。间隔和超时是监控频率和连接超时的可选设置。</string>
+    <string name="server_url">服务器 URL</string>
+    <string name="client_secret">客户端密钥</string>
+    <string name="uuid">UUID（可选）</string>
+    <string name="endpoint">端点</string>
+    <string name="token">令牌</string>
+    <string name="interval">间隔（秒）</string>
+    <string name="timeout">超时（秒）</string>
     <string name="save">保存</string>
     <string name="cancel">取消</string>
     <string name="configuration_saved">配置已保存</string>
@@ -47,13 +59,17 @@
     <string name="got_it">知道了</string>
     
     <!-- Service Notifications -->
+    <string name="monitoring_agent">监控 Agent</string>
     <string name="nezha_agent">哪吒 Agent</string>
-    <string name="nezha_agent_running">哪吒 Agent 运行中</string>
-    <string name="nezha_agent_running_root">哪吒 Agent 运行中 (root)</string>
-    <string name="nezha_agent_service">哪吒 Agent 服务</string>
+    <string name="komari_agent">Komari Agent</string>
+    <string name="agent_running">%s 运行中</string>
+    <string name="agent_running_root">%s 运行中 (root)</string>
+    <string name="agent_service">%s 服务</string>
+    <string name="monitoring_agent_service">监控 Agent 后台服务</string>
     <string name="nezha_agent_service_description">哪吒监控 Agent 后台服务</string>
+    <string name="komari_agent_service_description">Komari 监控 Agent 后台服务</string>
     <string name="stop">停止</string>
-    <string name="downloading_agent">正在下载哪吒 Agent 二进制文件...</string>
+    <string name="downloading_agent">正在下载 %s 二进制文件...</string>
     <string name="failed_download_agent">下载 Agent 二进制文件失败</string>
     <string name="agent_downloaded_starting">Agent 二进制文件已下载，正在启动...</string>
     <string name="agent_not_configured">Agent 未配置</string>
@@ -64,20 +80,26 @@
     <string name="running">运行中</string>
     <string name="stopped">已停止</string>
     <string name="not_installed">未安装</string>
-    <string name="agent_not_installed_toast">哪吒 Agent 二进制文件未安装。请打开应用下载。</string>
-    <string name="agent_not_configured_toast">哪吒 Agent 未配置。请在应用中配置服务器和密钥。</string>
-    <string name="failed_start_service">启动哪吒 Agent 失败: %s</string>
-    <string name="failed_stop_service">停止哪吒 Agent 失败: %s</string>
+    <string name="agent_not_installed_toast">%s 二进制文件未安装。请打开应用下载。</string>
+    <string name="agent_not_configured_toast">%s 未配置。请在应用中配置。</string>
+    <string name="failed_start_service">启动失败: %s</string>
+    <string name="failed_stop_service">停止失败: %s</string>
     
     <!-- Error Messages -->
-    <string name="agent_config_incomplete">哪吒 Agent 配置不完整。请配置服务器和密钥。</string>
-    <string name="failed_download_binary">下载哪吒 Agent 二进制文件失败</string>
+    <string name="agent_config_incomplete">Agent 配置不完整。请配置 Agent。</string>
+    <string name="nezha_agent_config_incomplete">哪吒 Agent 配置不完整。请配置服务器和密钥。</string>
+    <string name="komari_agent_config_incomplete">Komari Agent 配置不完整。请配置端点和令牌。</string>
+    <string name="failed_download_binary">下载 Agent 二进制文件失败</string>
     <string name="failed_create_config_file">创建配置文件失败</string>
     <string name="failed_start_agent">启动 Agent 失败: %s</string>
 
     <!-- Layout Strings -->
-    <string name="app_description">Android 哪吒监控 Agent</string>
+    <string name="app_description">Android 多代理监控</string>
+    <string name="nezha_app_description">Android 哪吒监控 Agent</string>
+    <string name="komari_app_description">Android Komari 监控 Agent</string>
+    <string name="agent_title">监控 Agent</string>
     <string name="nezha_agent_title">哪吒 Agent</string>
+    <string name="komari_agent_title">Komari Agent</string>
     <string name="configuration">配置</string>
     <string name="configure_server">配置服务器</string>
     <string name="system_information">系统信息</string>

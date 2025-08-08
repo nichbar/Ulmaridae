@@ -2,7 +2,6 @@
     <string name="app_name">Ulmaridae</string>
     
     <!-- Main Activity -->
-    <string name="agent_running">Agent is running</string>
     <string name="agent_stopped">Agent is stopped</string>
     <string name="root_available">Available</string>
     <string name="root_not_available">Not available</string>
@@ -19,9 +18,22 @@
     <string name="configuring">Configuring…</string>
     
     <!-- Configuration Dialog -->
+    <string name="configure_agent">Configure Agent</string>
     <string name="configure_nezha_agent">Configure Nezha Agent</string>
+    <string name="configure_komari_agent">Configure Komari Agent</string>
+    <string name="agent_type">Agent Type</string>
+    <string name="nezha_agent_name">Nezha Agent</string>
+    <string name="komari_agent_name">Komari Agent</string>
     <string name="enable_command_execute">Enable WebSSH</string>
-    <string name="configuration_dialog_description">Enter your Nezha server URL and agent secret. UUID is optional for identifying the device. These can be found in your Nezha dashboard.</string>
+    <string name="nezha_configuration_description">Enter your Nezha server URL and agent secret. UUID is optional for identifying the device. These can be found in your Nezha dashboard.</string>
+    <string name="komari_configuration_description">Enter your Komari endpoint and token. Interval and timeout are optional settings for monitoring frequency and connection timeout.</string>
+    <string name="server_url">Server URL</string>
+    <string name="client_secret">Client Secret</string>
+    <string name="uuid">UUID (Optional)</string>
+    <string name="endpoint">Endpoint</string>
+    <string name="token">Token</string>
+    <string name="interval">Interval (seconds)</string>
+    <string name="timeout">Timeout (seconds)</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="configuration_saved">Configuration saved</string>
@@ -47,13 +59,17 @@
     <string name="got_it">Got it</string>
     
     <!-- Service Notifications -->
+    <string name="monitoring_agent">Monitoring Agent</string>
     <string name="nezha_agent">Nezha Agent</string>
-    <string name="nezha_agent_running">Nezha Agent running</string>
-    <string name="nezha_agent_running_root">Nezha Agent running (root)</string>
-    <string name="nezha_agent_service">Nezha Agent Service</string>
+    <string name="komari_agent">Komari Agent</string>
+    <string name="agent_running">%s running</string>
+    <string name="agent_running_root">%s running (root)</string>
+    <string name="agent_service">%s Service</string>
+    <string name="monitoring_agent_service">Monitoring agent background service</string>
     <string name="nezha_agent_service_description">Nezha monitoring agent background service</string>
+    <string name="komari_agent_service_description">Komari monitoring agent background service</string>
     <string name="stop">Stop</string>
-    <string name="downloading_agent">Downloading nezha-agent binary...</string>
+    <string name="downloading_agent">Downloading %s binary...</string>
     <string name="failed_download_agent">Failed to download agent binary</string>
     <string name="agent_downloaded_starting">Agent binary downloaded, starting...</string>
     <string name="agent_not_configured">Agent not configured</string>
@@ -64,20 +80,26 @@
     <string name="running">Running</string>
     <string name="stopped">Stopped</string>
     <string name="not_installed">Not installed</string>
-    <string name="agent_not_installed_toast">Nezha agent binary not installed. Please open the app to download it.</string>
-    <string name="agent_not_configured_toast">Nezha agent not configured. Please configure server and secret in the app.</string>
-    <string name="failed_start_service">Failed to start Nezha Agent: %s</string>
-    <string name="failed_stop_service">Failed to stop Nezha Agent: %s</string>
+    <string name="agent_not_installed_toast">%s binary not installed. Please open the app to download it.</string>
+    <string name="agent_not_configured_toast">%s not configured. Please configure in the app.</string>
+    <string name="failed_start_service">Failed to start: %s</string>
+    <string name="failed_stop_service">Failed to stop: %s</string>
     
     <!-- Error Messages -->
-    <string name="agent_config_incomplete">Nezha agent configuration is incomplete. Please configure server and secret.</string>
-    <string name="failed_download_binary">Failed to download nezha-agent binary</string>
+    <string name="agent_config_incomplete">Agent configuration is incomplete. Please configure the agent.</string>
+    <string name="nezha_agent_config_incomplete">Nezha agent configuration is incomplete. Please configure server and secret.</string>
+    <string name="komari_agent_config_incomplete">Komari agent configuration is incomplete. Please configure endpoint and token.</string>
+    <string name="failed_download_binary">Failed to download agent binary</string>
     <string name="failed_create_config_file">Failed to create configuration file</string>
     <string name="failed_start_agent">Failed to start agent: %s</string>
     
     <!-- Layout Strings -->
-    <string name="app_description">Nezha monitoring agent for Android</string>
+    <string name="app_description">Multi-agent monitoring for Android</string>
+    <string name="nezha_app_description">Nezha monitoring agent for Android</string>
+    <string name="komari_app_description">Komari monitoring agent for Android</string>
+    <string name="agent_title">Monitoring Agent</string>
     <string name="nezha_agent_title">Nezha Agent</string>
+    <string name="komari_agent_title">Komari Agent</string>
     <string name="configuration">Configuration</string>
     <string name="configure_server">Configure Server</string>
     <string name="system_information">System Information</string>

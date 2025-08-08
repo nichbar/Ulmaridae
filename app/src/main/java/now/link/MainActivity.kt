@@ -15,7 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import now.link.navigation.AppNavigation
-import now.link.service.NezhaAgentTileService
+import now.link.service.UnifiedAgentTileService
 import now.link.ui.theme.UlmaridaeTheme
 import now.link.utils.LogManager
 import now.link.utils.ThemeManager
@@ -76,7 +76,7 @@ class MainActivity : ComponentActivity() {
 
         TileService.requestListeningState(
             this,
-            ComponentName(this, NezhaAgentTileService::class.java)
+            ComponentName(this, UnifiedAgentTileService::class.java)
         )
     }
 

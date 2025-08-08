@@ -43,19 +43,19 @@
             </intent-filter>
         </activity>
         
-        <!-- Nezha Agent Service -->
+        <!-- Unified Agent Service -->
         <service
-            android:name=".service.NezhaAgentService"
+            android:name=".service.UnifiedAgentService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
         
         <!-- Quick Settings Tile Service -->
         <service
-            android:name=".service.NezhaAgentTileService"
+            android:name=".service.UnifiedAgentTileService"
             android:exported="true"
             android:icon="@drawable/ic_app_notification"
-            android:label="Nezha Agent"
+            android:label="Monitoring Agent"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
 
             <meta-data android:name="android.service.quicksettings.ACTIVE_TILE"

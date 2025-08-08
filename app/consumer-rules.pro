@@ -7,8 +7,8 @@
 }
 
 # Keep Service classes that might be accessed externally
--keep class now.link.service.NezhaAgentService { *; }
--keep class now.link.service.NezhaAgentTileService { *; }
+-keep class now.link.service.UnifiedAgentService { *; }
+-keep class now.link.service.UnifiedAgentTileService { *; }
 
 # Keep model classes that might be serialized
 -keep class now.link.model.** { *; }
