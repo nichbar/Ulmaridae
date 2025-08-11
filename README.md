@@ -5,27 +5,44 @@
 
 **Languages:** [English](README.md) | [简体中文](README_zh-CN.md)
 
-Ulmaridae is an Android wrapper application for the modified [Nezha agent](https://github.com/nichbar/agent) , designed to run the agent on Android devices, even without root privileges.
+Ulmaridae is an Android wrapper application that supports multiple monitoring agents, designed to run monitoring agents on Android devices, even without root privileges.
+
+## Supported Monitoring Agents
+
+-   **[Nezha Agent](https://github.com/nichbar/agent)** - Modified Nezha monitoring agent
+-   **[Komari Agent](https://github.com/nichbar/komari-agent)** - Modified Komari monitoring agent
 
 ## Installation & Configuration
 
 1. Download and install the latest APK from the [releases page](https://github.com/nichbar/Ulmaridae/releases)
 2. Open the app on your Android device
-3. Tap "Configure" to set up your Nezha server details:
+3. Choose your monitoring agent:
+
+    - **Nezha Agent**: For Nezha monitoring dashboard
+    - **Komari Agent**: For Komari monitoring system
+
+4. Configure your chosen agent by tapping "Configure":
+
+    **For Nezha Agent:**
 
     - **Server URL**: Your Nezha server URL (e.g., `your-server.com:443`)
     - **Agent Secret**: The secret key for your agent (found in Nezha dashboard)
     - **UUID**: Unique identifier for the agent (optional, can be auto-generated)
 
+    **For Komari Agent:**
+
+    - **Endpoint**: Your Komari server endpoint
+    - **Token**: Your Komari authentication token
+
     ⚠️ **Important**: If you plan to enable WebSSH for this agent, please read the [Security Warning](#️-security-warning-webssh-feature) first.
 
-4. Grant the necessary permissions when prompted:
+5. Grant the necessary permissions when prompted:
 
     - Root access (if available)
     - Foreground service permission
     - Battery optimization exemption
 
-5. Toggle the "Enable Nezha Agent" switch to start the agent
+6. Toggle the "Enable Agent" switch to start the monitoring agent
 
 ## ⚠️ Security Warning: WebSSH Feature
 
@@ -77,10 +94,18 @@ Ulmaridae is an Android wrapper application for the modified [Nezha agent](https
 git clone https://github.com/nichbar/Ulmaridae.git
 cd Ulmaridae
 
-# Download nezha binary for ARM or ARM64 architecture
-./download-agent.sh arm64
+# Download agent binaries for ARM or ARM64 architecture
+# For Nezha Agent:
+./download-agent.sh nezha arm64
 
-# Build debug APK (includes bundled Nezha agent binary)
+# For Komari Agent:
+./download-agent.sh komari arm64
+
+# Or download both agents:
+./download-agent.sh nezha arm64
+./download-agent.sh komari arm64
+
+# Build debug APK (includes bundled agent binaries)
 ./gradlew assembleDebug
 
 # Build release APK (requires signing config)
@@ -101,7 +126,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
--   [Nezha Project](https://github.com/nezhahq/agent) - The core monitoring agent
+-   [Nezha Project](https://github.com/nezhahq/agent) - The original monitoring service
+-   [Nezha Agent](https://github.com/nezhahq/agent) - Nezha agent
+-   [Komari Agent](https://github.com/komari-monitor/komari-agent) - Komari monitoring agent
 -   Android Open Source Project - For the Android framework
 -   Material Design - For the UI components
 

@@ -67,6 +67,7 @@
     <string name="monitoring_agent">Monitoring Agent</string>
     <string name="nezha_agent">Nezha Agent</string>
     <string name="komari_agent">Komari Agent</string>
+    <string name="agent_status">Agent Status</string>
     <string name="agent_running">%s running</string>
     <string name="agent_running_root">%s running (root)</string>
     <string name="agent_service">%s Service</string>

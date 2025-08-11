@@ -67,6 +67,7 @@
     <string name="monitoring_agent">监控 Agent</string>
     <string name="nezha_agent">哪吒 Agent</string>
     <string name="komari_agent">Komari Agent</string>
+    <string name="agent_status">Agent 状态</string>
     <string name="agent_running">%s 运行中</string>
     <string name="agent_running_root">%s 运行中 (root)</string>
     <string name="agent_service">%s 服务</string>
@@ -99,7 +100,7 @@
     <string name="failed_start_agent">启动 Agent 失败: %s</string>
 
     <!-- Layout Strings -->
-    <string name="app_description">Android 多代理监控</string>
+    <string name="app_description">Android 多 Agent 监控</string>
     <string name="nezha_app_description">Android 哪吒监控 Agent</string>
     <string name="komari_app_description">Android Komari 监控 Agent</string>
     <string name="agent_title">监控 Agent</string>

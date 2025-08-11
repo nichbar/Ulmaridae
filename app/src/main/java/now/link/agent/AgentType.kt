@@ -22,7 +22,7 @@ enum class AgentType(
         binaryName = "komari-agent",
         configFileName = "config.yml",
         configDirName = "komari",
-        downloadRepo = "komari-monitor/komari-agent"
+        downloadRepo = "nichbar/komari-agent"
     );
     
     companion object {

@@ -100,6 +100,7 @@ fun MainScreen(
         StatusCard(
             isServiceRunning = uiState.isServiceRunning,
             isRootAvailable = uiState.isRootAvailable,
+            agentType = uiState.currentAgentType,
             deviceArchitecture = uiState.deviceArchitecture,
             serverConfiguration = uiState.agentConfiguration?.server ?: ""
         )
@@ -277,6 +278,7 @@ private fun AppHeaderCard() {
 private fun StatusCard(
     isServiceRunning: Boolean,
     isRootAvailable: Boolean,
+    agentType: AgentType,
     deviceArchitecture: String,
     serverConfiguration: String,
 ) {
@@ -300,9 +302,9 @@ private fun StatusCard(
             Spacer(modifier = Modifier.height(16.dp))
 
             StatusRow(
-                label = stringResource(id = R.string.agent_running),
+                label = stringResource(id = R.string.agent_status),
                 value = if (isServiceRunning) {
-                    stringResource(id = R.string.agent_running)
+                    stringResource(id = R.string.agent_running, agentType.displayName)
                 } else {
                     stringResource(id = R.string.agent_stopped)
                 },

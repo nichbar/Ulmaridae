@@ -42,7 +42,7 @@ jobs:
             - name: Download Nezha agent binaries for testing
               run: |
                   echo "Downloading ARM64 binary for CI testing..."
-                  ./download-agent.sh arm64
+                  ./download-agent.sh nezha arm64
 
             - name: Run unit tests
               run: ./gradlew testDebugUnitTest --stacktrace

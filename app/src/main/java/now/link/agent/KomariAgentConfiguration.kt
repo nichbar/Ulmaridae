@@ -30,9 +30,9 @@ data class KomariAgentConfiguration(
         // ignore auto-update
         args.add("--disable-auto-update")
 
-        args.addAll(listOf("--is-android", "true"))
+        args.add("--is-android=true")
 
-        args.addAll(listOf("--has-root-privilege", hasRoot.toString()))
+        args.add("--has-root-privilege=$hasRoot")
 
         return args
     }
