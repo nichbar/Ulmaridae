@@ -40,7 +40,7 @@ jobs:
                   chmod +x gradlew
                   chmod +x download-agent.sh
 
-            - name: Download Nezha agent binaries for all architectures
+            - name: Download agent binaries for all architectures
               run: |
                   echo "Downloading Nezha Agent binaries..."
                   echo "Downloading ARM64 binary..."
@@ -129,9 +129,9 @@ jobs:
                   ### Installation
                   1. Download the appropriate APK for your device architecture
                   2. Install the APK (enable \"Install from unknown sources\" if needed)
-                  3. Open the app and configure your Nezha server details
+                  3. Open the app and configure your server details
                   4. Grant necessary permissions when prompted
-                  5. Toggle the \"Enable Nezha Agent\" switch to start monitoring
+                  5. Toggle the \"Enable Agent\" switch to start monitoring
 
                   ### APK Variants
                   - universal - Contains all architectures, suitable for most devices
