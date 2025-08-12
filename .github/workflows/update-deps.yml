@@ -54,7 +54,7 @@ jobs:
                   echo "LATEST_NEZHA_RELEASE=$latest_release" >> $GITHUB_ENV
 
             - name: Create Pull Request for updates
-              uses: peter-evans/create-pull-request@v6
+              uses: peter-evans/create-pull-request@v7
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
                   commit-message: "chore: update dependencies and Nezha agent"
