@@ -14,7 +14,7 @@ workManager = "2.10.3"
 compose = "2024.12.01"
 composeActivity = "1.10.1"
 composeViewModel = "2.9.2"
-composeNavigation = "2.8.5"
+composeNavigation = "2.9.3"
 accompanist = "0.34.0"
 
 [libraries]
