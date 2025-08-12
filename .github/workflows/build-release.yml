@@ -99,7 +99,7 @@ jobs:
               uses: actions/checkout@v4
 
             - name: Download release APKs
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v5
               with:
                   name: release-apks
                   path: ./artifacts/
