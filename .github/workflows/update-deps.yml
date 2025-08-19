@@ -35,12 +35,6 @@ jobs:
             - name: Make gradlew executable
               run: chmod +x gradlew
 
-            - name: Check for dependency updates
-              run: ./gradlew dependencyUpdates
-
-            - name: Generate dependency update report
-              run: ./gradlew dependencyUpdates > dependency-updates.txt || true
-
             - name: Check for Nezha agent updates
               run: |
                   echo "Checking for new Nezha agent releases..."
