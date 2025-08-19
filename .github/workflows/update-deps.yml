@@ -35,9 +35,6 @@ jobs:
             - name: Make gradlew executable
               run: chmod +x gradlew
 
-            - name: Update Gradle Wrapper
-              run: ./gradlew wrapper --gradle-version=latest
-
             - name: Check for dependency updates
               run: ./gradlew dependencyUpdates
 
