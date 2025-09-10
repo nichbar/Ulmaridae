@@ -26,6 +26,8 @@ import now.link.utils.LogManager
 import now.link.utils.RootUtils
 import now.link.utils.ServiceStatusManager
 import now.link.utils.SPUtils
+import now.link.update.UpdateInfo
+import now.link.update.UpdateManager
 import androidx.core.net.toUri
 
 private const val TAG = "MainViewModel"
@@ -73,6 +75,11 @@ data class MainScreenUiState(
     val showWakeLockDialog: Boolean = false,
     val showAgentSelectionDialog: Boolean = false,
 
+    // Update-related states
+    val updateInfo: UpdateInfo? = null,
+    val showUpdateDialog: Boolean = false,
+    val isCheckingUpdate: Boolean = false,
+
     // Error handling
     val errorMessage: String? = null,
     val toastMessage: String? = null,
@@ -82,6 +89,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val configManager = UnifiedConfigurationManager(application)
     private val agentManager = UnifiedAgentManager(application)
+    private val updateManager = UpdateManager(application)
 
     // Modern StateFlow approach instead of LiveData
     private val _uiState = MutableStateFlow(MainScreenUiState())
@@ -96,6 +104,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         loadInitialState()
         observeServiceStatus()
         checkFirstLaunch()
+        checkForUpdatesOnLaunch()
     }
 
     private fun loadInitialState() {
@@ -395,5 +404,103 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun clearToast() {
         _uiState.update { it.copy(toastMessage = null) }
+    }
+
+    // Update check functionality
+    private fun checkForUpdatesOnLaunch() {
+        if (!updateManager.shouldCheckForUpdates()) {
+            LogManager.d(TAG, "Skipping update check - too soon since last check")
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                _uiState.update { it.copy(isCheckingUpdate = true) }
+                LogManager.d(TAG, "Checking for app updates...")
+
+                val updateInfo = updateManager.checkForUpdates()
+                if (updateInfo != null) {
+                    LogManager.i(TAG, "Update available: ${updateInfo.version}")
+                    _uiState.update { 
+                        it.copy(
+                            updateInfo = updateInfo,
+                            showUpdateDialog = true,
+                            isCheckingUpdate = false
+                        ) 
+                    }
+                } else {
+                    LogManager.d(TAG, "No updates available")
+                    _uiState.update { it.copy(isCheckingUpdate = false) }
+                }
+            } catch (e: Exception) {
+                LogManager.e(TAG, "Error checking for updates", e)
+                _uiState.update { 
+                    it.copy(
+                        isCheckingUpdate = false,
+                        errorMessage = "Failed to check for updates"
+                    ) 
+                }
+            }
+        }
+    }
+
+    fun checkForUpdatesManually() {
+        viewModelScope.launch {
+            try {
+                _uiState.update { it.copy(isCheckingUpdate = true) }
+                LogManager.d(TAG, "Manual update check initiated")
+
+                val updateInfo = updateManager.forceCheckForUpdates()
+                if (updateInfo != null) {
+                    LogManager.i(TAG, "Update available: ${updateInfo.version}")
+                    _uiState.update { 
+                        it.copy(
+                            updateInfo = updateInfo,
+                            showUpdateDialog = true,
+                            isCheckingUpdate = false
+                        ) 
+                    }
+                } else {
+                    LogManager.d(TAG, "No updates available")
+                    _uiState.update { 
+                        it.copy(
+                            isCheckingUpdate = false,
+                            toastMessage = "You have the latest version"
+                        ) 
+                    }
+                }
+            } catch (e: Exception) {
+                LogManager.e(TAG, "Error checking for updates", e)
+                _uiState.update { 
+                    it.copy(
+                        isCheckingUpdate = false,
+                        errorMessage = "Failed to check for updates"
+                    ) 
+                }
+            }
+        }
+    }
+
+    fun onUpdateDialogUpdate() {
+        LogManager.d(TAG, "User chose to update")
+        dismissUpdateDialog()
+    }
+
+    fun onUpdateDialogIgnore() {
+        val updateInfo = _uiState.value.updateInfo
+        if (updateInfo != null) {
+            LogManager.d(TAG, "User ignored version: ${updateInfo.version}")
+            updateManager.ignoreVersion(updateInfo.version)
+        }
+        dismissUpdateDialog()
+    }
+
+    fun dismissUpdateDialog() {
+        _uiState.update { 
+            it.copy(
+                showUpdateDialog = false,
+                updateInfo = null
+            ) 
+        }
     }
 }

@@ -152,4 +152,15 @@
     
     <!-- Clipboard -->
     <string name="app_logs">App Logs</string>
+    
+    <!-- Update Dialog -->
+    <string name="update_available_title">Update Available</string>
+    <string name="update_version_info">Version %s is available</string>
+    <string name="update_whats_new">What\'s New</string>
+    <string name="update_download">Update</string>
+    <string name="update_ignore">Ignore</string>
+    <string name="update_checking">Checking for updates…</string>
+    <string name="update_check_failed">Failed to check for updates</string>
+    <string name="update_no_updates">You have the latest version</string>
+    <string name="check_for_updates">Check for Updates</string>
 </resources>

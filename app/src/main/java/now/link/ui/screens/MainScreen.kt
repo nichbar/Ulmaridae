@@ -31,6 +31,7 @@ import now.link.agent.KomariAgentConfiguration
 import now.link.agent.NezhaAgentConfiguration
 import now.link.ui.components.AgentSelectionDialog
 import now.link.ui.components.UnifiedConfigurationDialog
+import now.link.ui.components.UpdateDialog
 import now.link.ui.components.WakeLockInfoDialog
 import now.link.utils.Constants
 import now.link.utils.LogManager
@@ -157,7 +158,11 @@ fun MainScreen(
         )
 
         // Actions Card
-        ActionsCard(onLogsClick = onLogsClick)
+        ActionsCard(
+            onLogsClick = onLogsClick,
+            onCheckUpdateClick = { viewModel.checkForUpdatesManually() },
+            isCheckingUpdate = uiState.isCheckingUpdate
+        )
     }
 
     // Permission Dialog
@@ -229,6 +234,16 @@ fun MainScreen(
                 viewModel.selectAgent(agentType)
             },
             onDismiss = { viewModel.dismissAgentSelectionDialog() }
+        )
+    }
+
+    // Update Dialog
+    if (uiState.showUpdateDialog && uiState.updateInfo != null) {
+        UpdateDialog(
+            updateInfo = uiState.updateInfo!!,
+            onUpdate = { viewModel.onUpdateDialogUpdate() },
+            onIgnore = { viewModel.onUpdateDialogIgnore() },
+            onDismiss = { viewModel.dismissUpdateDialog() }
         )
     }
 }
@@ -636,6 +651,8 @@ private fun ThemeSettingsCard(
 @Composable
 private fun ActionsCard(
     onLogsClick: () -> Unit,
+    onCheckUpdateClick: () -> Unit,
+    isCheckingUpdate: Boolean,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -661,6 +678,29 @@ private fun ActionsCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(id = R.string.view_logs))
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedButton(
+                onClick = onCheckUpdateClick,
+                enabled = !isCheckingUpdate,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (isCheckingUpdate) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp
+                        )
+                        Text(stringResource(id = R.string.update_checking))
+                    }
+                } else {
+                    Text(stringResource(id = R.string.check_for_updates))
+                }
             }
         }
     }

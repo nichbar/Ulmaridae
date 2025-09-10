@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 import java.util.Properties
@@ -14,7 +15,7 @@ android {
         applicationId = "now.link.ulmaridae"
         minSdk = 24
         targetSdk = 36
-        versionCode = 6
+        versionCode = 600
         versionName = "0.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -42,6 +43,7 @@ android {
     // Enable R8 full mode
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     
     composeOptions {
@@ -177,6 +179,7 @@ dependencies {
     implementation(libs.androidx.compose.livedata)
     implementation(libs.androidx.compose.navigation)
     implementation(libs.accompanist.permissions)
+    implementation(libs.kotlinx.serialization.json)
     
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
