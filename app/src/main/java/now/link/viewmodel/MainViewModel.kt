@@ -26,6 +26,7 @@ import now.link.utils.LogManager
 import now.link.utils.RootUtils
 import now.link.utils.ServiceStatusManager
 import now.link.utils.SPUtils
+import now.link.utils.AutoStartManager
 import now.link.update.UpdateInfo
 import now.link.update.UpdateManager
 import androidx.core.net.toUri
@@ -64,6 +65,7 @@ data class MainScreenUiState(
     val installedAgentTypes: List<AgentType> = emptyList(),
     val isWakeLockEnabled: Boolean = false,
     val isLoggingEnabled: Boolean = false,
+    val isAutoStartEnabled: Boolean = false,
 
     // Action states using sealed classes
     val serviceAction: ServiceAction = ServiceAction.Idle,
@@ -101,6 +103,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         .asLiveData(viewModelScope.coroutineContext)
 
     init {
+        AutoStartManager.initialize()
         loadInitialState()
         observeServiceStatus()
         checkFirstLaunch()
@@ -117,6 +120,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     installedAgentTypes = agentManager.findInstalledAgents(),
                     isWakeLockEnabled = SPUtils.getBoolean(Constants.Preferences.WAKE_LOCK_ENABLED),
                     isLoggingEnabled = LogManager.isLogEnabled(),
+                    isAutoStartEnabled = AutoStartManager.isAutoStartEnabled,
                     deviceArchitecture = agentManager.getDeviceArchitecture(),
                     isRootAvailable = RootUtils.isRootAvailable()
                 )
@@ -344,6 +348,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         LogManager.setLogEnabled(enabled)
         _uiState.update { it.copy(isLoggingEnabled = enabled) }
         LogManager.i(TAG, "Logging preference changed: $enabled")
+    }
+
+    fun updateAutoStartEnabled(enabled: Boolean) {
+        AutoStartManager.setAutoStartEnabled(enabled)
+        _uiState.update { it.copy(isAutoStartEnabled = enabled) }
+        LogManager.i(TAG, "Auto-start preference changed: $enabled")
     }
 
     fun showWakeLockDialog() {

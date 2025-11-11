@@ -115,6 +115,8 @@
     <string name="advanced_settings">高级设置</string>
     <string name="acquire_wake_lock">获取唤醒锁</string>
     <string name="wake_lock_description">防止 CPU 休眠以确保持续监控</string>
+    <string name="auto_start_enabled">开机自动启动</string>
+    <string name="auto_start_description">设备启动时自动启动监控代理</string>
     <string name="enable_logging">启用内存日志</string>
     <string name="logging_description">在内存中保存日志用于调试（最多10,000条）</string>
     <string name="actions">操作</string>
