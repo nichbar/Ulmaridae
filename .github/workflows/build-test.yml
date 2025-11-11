@@ -70,7 +70,7 @@ jobs:
                   if [ -n "$KEYSTORE_FILE" ]; then
                     echo "Keystore found, building signed release APKs..."
                     echo "$KEYSTORE_FILE" | base64 -d > keystore.jks
-                    ./gradlew assembleRelease --no-abi-splits --stacktrace
+                    ./gradlew assembleRelease
                   else
                     echo "No keystore configured, cannot build signed APKs"
                     exit 1
