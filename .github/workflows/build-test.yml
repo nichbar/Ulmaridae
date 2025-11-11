@@ -39,6 +39,7 @@ jobs:
 
             - name: Download agent binaries for all architectures
               run: |
+                  set -e  # Exit immediately on any command failure
                   echo "Downloading Nezha Agent binaries..."
                   echo "Downloading ARM64 binary..."
                   ./download-agent.sh nezha arm64
@@ -69,7 +70,7 @@ jobs:
                   if [ -n "$KEYSTORE_FILE" ]; then
                     echo "Keystore found, building signed release APKs..."
                     echo "$KEYSTORE_FILE" | base64 -d > keystore.jks
-                    ./gradlew assembleRelease --stacktrace
+                    ./gradlew assembleRelease --no-abi-splits --stacktrace
                   else
                     echo "No keystore configured, cannot build signed APKs"
                     exit 1
@@ -95,3 +96,11 @@ jobs:
                   name: ${{ steps.branch.outputs.BRANCH_NAME }}-release-apks
                   path: app/build/outputs/apk/release/*.apk
                   retention-days: 30
+
+            - name: Cleanup keystore
+              if: always()
+              run: |
+                if [ -f "keystore.jks" ]; then
+                  echo "Cleaning up keystore file..."
+                  shred -vfz -n 3 keystore.jks 2>/dev/null || rm -f keystore.jks
+                fi
