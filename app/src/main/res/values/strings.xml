@@ -115,6 +115,8 @@
     <string name="advanced_settings">Advanced Settings</string>
     <string name="acquire_wake_lock">Acquire Wake Lock</string>
     <string name="wake_lock_description">Prevents CPU sleep to ensure continuous monitoring</string>
+    <string name="auto_start_enabled">Auto-start on Boot</string>
+    <string name="auto_start_description">Automatically start the monitoring agent when the device boots up</string>
     <string name="enable_logging">Enable In-Memory Logging</string>
     <string name="logging_description">Save logs in memory for debugging (max 10,000 entries)</string>
     <string name="actions">Actions</string>

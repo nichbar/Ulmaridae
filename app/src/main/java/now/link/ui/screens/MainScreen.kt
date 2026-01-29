@@ -126,12 +126,16 @@ fun MainScreen(
         AdvancedSettingsCard(
             isWakeLockEnabled = uiState.isWakeLockEnabled,
             isLoggingEnabled = uiState.isLoggingEnabled,
+            isAutoStartEnabled = uiState.isAutoStartEnabled,
             currentAgentType = uiState.currentAgentType,
             onWakeLockChanged = { enabled ->
                 viewModel.updateWakeLockEnabled(enabled)
             },
             onLoggingChanged = { enabled ->
                 viewModel.updateLoggingEnabled(enabled)
+            },
+            onAutoStartChanged = { enabled ->
+                viewModel.updateAutoStartEnabled(enabled)
             },
             onAgentTypeChanged = { agentType ->
                 viewModel.switchAgent(context, agentType)
@@ -469,9 +473,11 @@ private fun ServiceControlCard(
 private fun AdvancedSettingsCard(
     isWakeLockEnabled: Boolean,
     isLoggingEnabled: Boolean,
+    isAutoStartEnabled: Boolean,
     currentAgentType: AgentType,
     onWakeLockChanged: (Boolean) -> Unit,
     onLoggingChanged: (Boolean) -> Unit,
+    onAutoStartChanged: (Boolean) -> Unit,
     onAgentTypeChanged: (AgentType) -> Unit,
 ) {
     Card(
@@ -499,6 +505,16 @@ private fun AdvancedSettingsCard(
                 description = stringResource(id = R.string.wake_lock_description),
                 isEnabled = isWakeLockEnabled,
                 onToggle = onWakeLockChanged
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Auto-start Setting
+            SettingRow(
+                title = stringResource(id = R.string.auto_start_enabled),
+                description = stringResource(id = R.string.auto_start_description),
+                isEnabled = isAutoStartEnabled,
+                onToggle = onAutoStartChanged
             )
 
             Spacer(modifier = Modifier.height(16.dp))

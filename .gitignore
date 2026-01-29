@@ -14,6 +14,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+.env
+.mise.toml
 
 # Signing configuration (contains sensitive information)
 signing.properties
