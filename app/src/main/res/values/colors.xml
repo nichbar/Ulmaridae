@@ -51,6 +51,8 @@
     <color name="md_theme_light_outlineVariant">#FFC5C6CA</color>
     <color name="md_theme_light_scrim">#FF000000</color>
 
+    <color name="md_theme_light_surfaceContainerLowest">#FFFFFFFF</color>
+
     <!-- Dark theme fallbacks -->
     <color name="md_theme_dark_primary">#FFB8BCC2</color>
     <color name="md_theme_dark_onPrimary">#FF2F3032</color>
@@ -68,14 +70,14 @@
     <color name="md_theme_dark_errorContainer">#FF93000A</color>
     <color name="md_theme_dark_onError">#FF690005</color>
     <color name="md_theme_dark_onErrorContainer">#FFFFDAD6</color>
-    <color name="md_theme_dark_background">#FF111111</color>
+    <color name="md_theme_dark_background">#FF1C2228</color>
     <color name="md_theme_dark_onBackground">#FFE4E4E4</color>
-    <color name="md_theme_dark_surface">#FF111111</color>
+    <color name="md_theme_dark_surface">#FF1C2228</color>
     <color name="md_theme_dark_onSurface">#FFE4E4E4</color>
     <color name="md_theme_dark_surfaceVariant">#FF44474A</color>
     <color name="md_theme_dark_onSurfaceVariant">#FFC5C6CA</color>
     <color name="md_theme_dark_outline">#FF8F9195</color>
-    <color name="md_theme_dark_inverseOnSurface">#FF111111</color>
+    <color name="md_theme_dark_inverseOnSurface">#FF1C2228</color>
     <color name="md_theme_dark_inverseSurface">#FFE4E4E4</color>
     <color name="md_theme_dark_inversePrimary">#FF5F6368</color>
     <color name="md_theme_dark_surfaceTint">#FFB8BCC2</color>

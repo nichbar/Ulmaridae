@@ -1,5 +1,6 @@
 package now.link.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -10,130 +11,205 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import now.link.utils.ThemeManager
 
-// Material 3 Color Scheme (Grey Theme) - Updated for grey primary
-private val md_theme_light_primary = Color(0xFF5F6368)
-private val md_theme_light_onPrimary = Color(0xFFFFFFFF)
-private val md_theme_light_primaryContainer = Color(0xFFE3E4E6)
-private val md_theme_light_onPrimaryContainer = Color(0xFF1C1D1F)
-private val md_theme_light_secondary = Color(0xFF5F6368)
-private val md_theme_light_onSecondary = Color(0xFFFFFFFF)
-private val md_theme_light_secondaryContainer = Color(0xFFE4E5E7)
-private val md_theme_light_onSecondaryContainer = Color(0xFF1D1E20)
-private val md_theme_light_tertiary = Color(0xFF6B6B74)
-private val md_theme_light_onTertiary = Color(0xFFFFFFFF)
-private val md_theme_light_tertiaryContainer = Color(0xFFE8E8F0)
-private val md_theme_light_onTertiaryContainer = Color(0xFF25252E)
-private val md_theme_light_error = Color(0xFFBA1A1A)
-private val md_theme_light_errorContainer = Color(0xFFFFDAD6)
-private val md_theme_light_onError = Color(0xFFFFFFFF)
-private val md_theme_light_onErrorContainer = Color(0xFF410002)
-private val md_theme_light_background = Color(0xFFFCFCFC)
-private val md_theme_light_onBackground = Color(0xFF1A1A1A)
-private val md_theme_light_surface = Color(0xFFFCFCFC)
-private val md_theme_light_onSurface = Color(0xFF1A1A1A)
-private val md_theme_light_surfaceVariant = Color(0xFFE1E2E4)
-private val md_theme_light_onSurfaceVariant = Color(0xFF44474A)
-private val md_theme_light_outline = Color(0xFF757780)
-private val md_theme_light_inverseOnSurface = Color(0xFFF2F2F2)
-private val md_theme_light_inverseSurface = Color(0xFF2F2F2F)
-private val md_theme_light_inversePrimary = Color(0xFFB8BCC2)
-private val md_theme_light_surfaceTint = Color(0xFF5F6368)
-private val md_theme_light_outlineVariant = Color(0xFFC5C6CA)
-private val md_theme_light_scrim = Color(0xFF000000)
+// Neutral slate palette (matching markread / Mastigias)
+val PrimaryLight = Color(0xFF5F6368)
+val OnPrimaryLight = Color(0xFFFFFFFF)
+val PrimaryContainerLight = Color(0xFFE3E4E6)
+val OnPrimaryContainerLight = Color(0xFF1C1D1F)
 
-private val md_theme_dark_primary = Color(0xFFB8BCC2)
-private val md_theme_dark_onPrimary = Color(0xFF2F3032)
-private val md_theme_dark_primaryContainer = Color(0xFF46494C)
-private val md_theme_dark_onPrimaryContainer = Color(0xFFE3E4E6)
-private val md_theme_dark_secondary = Color(0xFFBCC0C4)
-private val md_theme_dark_onSecondary = Color(0xFF303236)
-private val md_theme_dark_secondaryContainer = Color(0xFF47494D)
-private val md_theme_dark_onSecondaryContainer = Color(0xFFE4E5E7)
-private val md_theme_dark_tertiary = Color(0xFFCACBD3)
-private val md_theme_dark_onTertiary = Color(0xFF3B3B44)
-private val md_theme_dark_tertiaryContainer = Color(0xFF525259)
-private val md_theme_dark_onTertiaryContainer = Color(0xFFE8E8F0)
-private val md_theme_dark_error = Color(0xFFFFB4AB)
-private val md_theme_dark_errorContainer = Color(0xFF93000A)
-private val md_theme_dark_onError = Color(0xFF690005)
-private val md_theme_dark_onErrorContainer = Color(0xFFFFDAD6)
-private val md_theme_dark_background = Color(0xFF111111)
-private val md_theme_dark_onBackground = Color(0xFFE4E4E4)
-private val md_theme_dark_surface = Color(0xFF111111)
-private val md_theme_dark_onSurface = Color(0xFFE4E4E4)
-private val md_theme_dark_surfaceVariant = Color(0xFF44474A)
-private val md_theme_dark_onSurfaceVariant = Color(0xFFC5C6CA)
-private val md_theme_dark_outline = Color(0xFF8F9195)
-private val md_theme_dark_inverseOnSurface = Color(0xFF111111)
-private val md_theme_dark_inverseSurface = Color(0xFFE4E4E4)
-private val md_theme_dark_inversePrimary = Color(0xFF5F6368)
-private val md_theme_dark_surfaceTint = Color(0xFFB8BCC2)
-private val md_theme_dark_outlineVariant = Color(0xFF44474A)
-private val md_theme_dark_scrim = Color(0xFF000000)
+val SecondaryLight = Color(0xFF5F6368)
+val OnSecondaryLight = Color(0xFFFFFFFF)
+val SecondaryContainerLight = Color(0xFFE4E5E7)
+val OnSecondaryContainerLight = Color(0xFF1D1E20)
 
-private val LightColors = lightColorScheme(
-    primary = md_theme_light_primary,
-    onPrimary = md_theme_light_onPrimary,
-    primaryContainer = md_theme_light_primaryContainer,
-    onPrimaryContainer = md_theme_light_onPrimaryContainer,
-    secondary = md_theme_light_secondary,
-    onSecondary = md_theme_light_onSecondary,
-    secondaryContainer = md_theme_light_secondaryContainer,
-    onSecondaryContainer = md_theme_light_onSecondaryContainer,
-    tertiary = md_theme_light_tertiary,
-    onTertiary = md_theme_light_onTertiary,
-    tertiaryContainer = md_theme_light_tertiaryContainer,
-    onTertiaryContainer = md_theme_light_onTertiaryContainer,
-    error = md_theme_light_error,
-    errorContainer = md_theme_light_errorContainer,
-    onError = md_theme_light_onError,
-    onErrorContainer = md_theme_light_onErrorContainer,
-    background = md_theme_light_background,
-    onBackground = md_theme_light_onBackground,
-    surface = md_theme_light_surface,
-    onSurface = md_theme_light_onSurface,
-    surfaceVariant = md_theme_light_surfaceVariant,
-    onSurfaceVariant = md_theme_light_onSurfaceVariant,
-    outline = md_theme_light_outline,
-    inverseOnSurface = md_theme_light_inverseOnSurface,
-    inverseSurface = md_theme_light_inverseSurface,
-    inversePrimary = md_theme_light_inversePrimary,
-    surfaceTint = md_theme_light_surfaceTint,
-    outlineVariant = md_theme_light_outlineVariant,
-    scrim = md_theme_light_scrim,
+val TertiaryLight = Color(0xFF6B6B74)
+val OnTertiaryLight = Color(0xFFFFFFFF)
+val TertiaryContainerLight = Color(0xFFE8E8F0)
+val OnTertiaryContainerLight = Color(0xFF25252E)
+
+val BackgroundLight = Color(0xFFFCFCFC)
+val OnBackgroundLight = Color(0xFF1A1A1A)
+val SurfaceLight = Color(0xFFFCFCFC)
+val OnSurfaceLight = Color(0xFF1A1A1A)
+val SurfaceVariantLight = Color(0xFFE1E2E4)
+val OnSurfaceVariantLight = Color(0xFF44474A)
+val OutlineLight = Color(0xFF757780)
+val OutlineVariantLight = Color(0xFFC5C6CA)
+val ScrimLight = Color(0xFF000000)
+
+val InverseSurfaceLight = Color(0xFF2F2F2F)
+val InverseOnSurfaceLight = Color(0xFFF2F2F2)
+val InversePrimaryLight = Color(0xFFB8BCC2)
+val SurfaceTintLight = Color(0xFF5F6368)
+
+val SurfaceDimLight = Color(0xFFD8D9DB)
+val SurfaceBrightLight = Color(0xFFFCFCFC)
+val SurfaceContainerLowestLight = Color(0xFFFFFFFF)
+val SurfaceContainerLowLight = Color(0xFFF6F6F8)
+val SurfaceContainerLight = Color(0xFFF0F1F3)
+val SurfaceContainerHighLight = Color(0xFFEAEBEE)
+val SurfaceContainerHighestLight = Color(0xFFE1E2E4)
+
+val PrimaryFixedLight = Color(0xFFE3E4E6)
+val OnPrimaryFixedLight = Color(0xFF1C1D1F)
+val PrimaryFixedDimLight = Color(0xFFB8BCC2)
+val OnPrimaryFixedVariantLight = Color(0xFF5F6368)
+
+val SecondaryFixedLight = Color(0xFFE4E5E7)
+val OnSecondaryFixedLight = Color(0xFF1D1E20)
+val SecondaryFixedDimLight = Color(0xFFBCC0C4)
+val OnSecondaryFixedVariantLight = Color(0xFF5F6368)
+
+val TertiaryFixedLight = Color(0xFFE8E8F0)
+val OnTertiaryFixedLight = Color(0xFF25252E)
+val TertiaryFixedDimLight = Color(0xFFCACBD3)
+val OnTertiaryFixedVariantLight = Color(0xFF6B6B74)
+
+val ErrorLight = Color(0xFFBA1A1A)
+val OnErrorLight = Color(0xFFFFFFFF)
+val ErrorContainerLight = Color(0xFFFFDAD6)
+val OnErrorContainerLight = Color(0xFF410002)
+
+// Dark palette
+val PrimaryDark = Color(0xFFB8BCC2)
+val OnPrimaryDark = Color(0xFF2F3032)
+val PrimaryContainerDark = Color(0xFF46494C)
+val OnPrimaryContainerDark = Color(0xFFE3E4E6)
+
+val SecondaryDark = Color(0xFFBCC0C4)
+val OnSecondaryDark = Color(0xFF303236)
+val SecondaryContainerDark = Color(0xFF47494D)
+val OnSecondaryContainerDark = Color(0xFFE4E5E7)
+
+val TertiaryDark = Color(0xFFCACBD3)
+val OnTertiaryDark = Color(0xFF3B3B44)
+val TertiaryContainerDark = Color(0xFF525259)
+val OnTertiaryContainerDark = Color(0xFFE8E8F0)
+
+val BackgroundDark = Color(0xFF1C2228)
+val OnBackgroundDark = Color(0xFFE4E4E4)
+val SurfaceDark = Color(0xFF1C2228)
+val OnSurfaceDark = Color(0xFFE4E4E4)
+val SurfaceVariantDark = Color(0xFF44474A)
+val OnSurfaceVariantDark = Color(0xFFC5C6CA)
+val OutlineDark = Color(0xFF8F9195)
+val OutlineVariantDark = Color(0xFF44474A)
+val ScrimDark = Color(0xFF000000)
+
+val InverseSurfaceDark = Color(0xFFE4E4E4)
+val InverseOnSurfaceDark = Color(0xFF1C2228)
+val InversePrimaryDark = Color(0xFF5F6368)
+val SurfaceTintDark = Color(0xFFB8BCC2)
+
+val SurfaceDimDark = Color(0xFF14181D)
+val SurfaceBrightDark = Color(0xFF32383F)
+val SurfaceContainerLowestDark = Color(0xFF0F1216)
+val SurfaceContainerLowDark = Color(0xFF181E23)
+val SurfaceContainerDark = Color(0xFF1C2228)
+val SurfaceContainerHighDark = Color(0xFF262D34)
+val SurfaceContainerHighestDark = Color(0xFF44474A)
+
+val PrimaryFixedDark = Color(0xFFE3E4E6)
+val OnPrimaryFixedDark = Color(0xFF1C1D1F)
+val PrimaryFixedDimDark = Color(0xFFB8BCC2)
+val OnPrimaryFixedVariantDark = Color(0xFF5F6368)
+
+val SecondaryFixedDark = Color(0xFFE4E5E7)
+val OnSecondaryFixedDark = Color(0xFF1D1E20)
+val SecondaryFixedDimDark = Color(0xFFBCC0C4)
+val OnSecondaryFixedVariantDark = Color(0xFF5F6368)
+
+val TertiaryFixedDark = Color(0xFFE8E8F0)
+val OnTertiaryFixedDark = Color(0xFF25252E)
+val TertiaryFixedDimDark = Color(0xFFCACBD3)
+val OnTertiaryFixedVariantDark = Color(0xFF6B6B74)
+
+val ErrorDark = Color(0xFFFFB4AB)
+val OnErrorDark = Color(0xFF690005)
+val ErrorContainerDark = Color(0xFF93000A)
+val OnErrorContainerDark = Color(0xFFFFDAD6)
+
+val LightColorScheme = lightColorScheme(
+    primary = PrimaryLight,
+    onPrimary = OnPrimaryLight,
+    primaryContainer = PrimaryContainerLight,
+    onPrimaryContainer = OnPrimaryContainerLight,
+    secondary = SecondaryLight,
+    onSecondary = OnSecondaryLight,
+    secondaryContainer = SecondaryContainerLight,
+    onSecondaryContainer = OnSecondaryContainerLight,
+    tertiary = TertiaryLight,
+    onTertiary = OnTertiaryLight,
+    tertiaryContainer = TertiaryContainerLight,
+    onTertiaryContainer = OnTertiaryContainerLight,
+    background = BackgroundLight,
+    onBackground = OnBackgroundLight,
+    surface = SurfaceLight,
+    onSurface = OnSurfaceLight,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = OnSurfaceVariantLight,
+    outline = OutlineLight,
+    outlineVariant = OutlineVariantLight,
+    scrim = ScrimLight,
+    inverseSurface = InverseSurfaceLight,
+    inverseOnSurface = InverseOnSurfaceLight,
+    inversePrimary = InversePrimaryLight,
+    surfaceTint = SurfaceTintLight,
+    surfaceDim = SurfaceDimLight,
+    surfaceBright = SurfaceBrightLight,
+    surfaceContainerLowest = SurfaceContainerLowestLight,
+    surfaceContainerLow = SurfaceContainerLowLight,
+    surfaceContainer = SurfaceContainerLight,
+    surfaceContainerHigh = SurfaceContainerHighLight,
+    surfaceContainerHighest = SurfaceContainerHighestLight,
+    error = ErrorLight,
+    onError = OnErrorLight,
+    errorContainer = ErrorContainerLight,
+    onErrorContainer = OnErrorContainerLight
 )
 
-private val DarkColors = darkColorScheme(
-    primary = md_theme_dark_primary,
-    onPrimary = md_theme_dark_onPrimary,
-    primaryContainer = md_theme_dark_primaryContainer,
-    onPrimaryContainer = md_theme_dark_onPrimaryContainer,
-    secondary = md_theme_dark_secondary,
-    onSecondary = md_theme_dark_onSecondary,
-    secondaryContainer = md_theme_dark_secondaryContainer,
-    onSecondaryContainer = md_theme_dark_onSecondaryContainer,
-    tertiary = md_theme_dark_tertiary,
-    onTertiary = md_theme_dark_onTertiary,
-    tertiaryContainer = md_theme_dark_tertiaryContainer,
-    onTertiaryContainer = md_theme_dark_onTertiaryContainer,
-    error = md_theme_dark_error,
-    errorContainer = md_theme_dark_errorContainer,
-    onError = md_theme_dark_onError,
-    onErrorContainer = md_theme_dark_onErrorContainer,
-    background = md_theme_dark_background,
-    onBackground = md_theme_dark_onBackground,
-    surface = md_theme_dark_surface,
-    onSurface = md_theme_dark_onSurface,
-    surfaceVariant = md_theme_dark_surfaceVariant,
-    onSurfaceVariant = md_theme_dark_onSurfaceVariant,
-    outline = md_theme_dark_outline,
-    inverseOnSurface = md_theme_dark_inverseOnSurface,
-    inverseSurface = md_theme_dark_inverseSurface,
-    inversePrimary = md_theme_dark_inversePrimary,
-    surfaceTint = md_theme_dark_surfaceTint,
-    outlineVariant = md_theme_dark_outlineVariant,
-    scrim = md_theme_dark_scrim,
+val DarkColorScheme = darkColorScheme(
+    primary = PrimaryDark,
+    onPrimary = OnPrimaryDark,
+    primaryContainer = PrimaryContainerDark,
+    onPrimaryContainer = OnPrimaryContainerDark,
+    secondary = SecondaryDark,
+    onSecondary = OnSecondaryDark,
+    secondaryContainer = SecondaryContainerDark,
+    onSecondaryContainer = OnSecondaryContainerDark,
+    tertiary = TertiaryDark,
+    onTertiary = OnTertiaryDark,
+    tertiaryContainer = TertiaryContainerDark,
+    onTertiaryContainer = OnTertiaryContainerDark,
+    background = BackgroundDark,
+    onBackground = OnBackgroundDark,
+    surface = SurfaceDark,
+    onSurface = OnSurfaceDark,
+    surfaceVariant = SurfaceVariantDark,
+    onSurfaceVariant = OnSurfaceVariantDark,
+    outline = OutlineDark,
+    outlineVariant = OutlineVariantDark,
+    scrim = ScrimDark,
+    inverseSurface = InverseSurfaceDark,
+    inverseOnSurface = InverseOnSurfaceDark,
+    inversePrimary = InversePrimaryDark,
+    surfaceTint = SurfaceTintDark,
+    surfaceDim = SurfaceDimDark,
+    surfaceBright = SurfaceBrightDark,
+    surfaceContainerLowest = SurfaceContainerLowestDark,
+    surfaceContainerLow = SurfaceContainerLowDark,
+    surfaceContainer = SurfaceContainerDark,
+    surfaceContainerHigh = SurfaceContainerHighDark,
+    surfaceContainerHighest = SurfaceContainerHighestDark,
+    error = ErrorDark,
+    onError = OnErrorDark,
+    errorContainer = ErrorContainerDark,
+    onErrorContainer = OnErrorContainerDark
 )
+
+// Backward compatibility aliases
+val LightColors = LightColorScheme
+val DarkColors = DarkColorScheme
 
 @Composable
 fun UlmaridaeTheme(
@@ -146,7 +222,7 @@ fun UlmaridaeTheme(
     
     // Determine dark theme state
     val darkTheme = if (followSystemTheme) {
-        androidx.compose.foundation.isSystemInDarkTheme()
+        isSystemInDarkTheme()
     } else {
         darkModeEnabled
     }
@@ -159,8 +235,8 @@ fun UlmaridaeTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
         // Otherwise, use the predefined fallback scheme
-        darkTheme -> DarkColors
-        else -> LightColors
+        darkTheme -> DarkColorScheme
+        else -> LightColorScheme
     }
 
     MaterialTheme(
