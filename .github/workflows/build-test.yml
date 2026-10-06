@@ -45,20 +45,12 @@ jobs:
                   ./download-agent.sh nezha arm64
                   echo "Downloading ARM32 binary..."
                   ./download-agent.sh nezha arm
-                  echo "Downloading X86_64 binary..."
-                  ./download-agent.sh nezha amd64
-                  echo "Downloading X86 binary..."
-                  ./download-agent.sh nezha 386
 
                   echo "Downloading Komari Agent binaries..."
                   echo "Downloading ARM64 binary..."
                   ./download-agent.sh komari arm64
                   echo "Downloading ARM32 binary..."
                   ./download-agent.sh komari arm
-                  echo "Downloading X86_64 binary..."
-                  ./download-agent.sh komari amd64
-                  echo "Downloading X86 binary..."
-                  ./download-agent.sh komari 386
 
             - name: Build signed release APKs
               env:

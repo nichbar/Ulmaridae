@@ -75,61 +75,8 @@ get_jni_lib_dir() {
         arm)
             echo "app/src/main/jniLibs/armeabi-v7a"
             ;;
-        amd64)
-            echo "app/src/main/jniLibs/x86_64"
-            ;;
-        386)
-            echo "app/src/main/jniLibs/x86"
-            ;;
         *)
             echo "app/src/main/jniLibs/unsupported"
-            ;;
-    esac
-}
-
-# Function to get agent binary name
-get_agent_binary_name() {
-    local agent="$1"
-    case "$agent" in
-        nezha)
-            echo "nezha-agent"
-            ;;
-        komari)
-            echo "komari-agent"
-            ;;
-        *)
-            echo ""
-            ;;
-    esac
-}
-
-# Function to get agent repository
-get_agent_repo() {
-    local agent="$1"
-    case "$agent" in
-        nezha)
-            echo "nichbar/agent"
-            ;;
-        komari)
-            echo "nichbar/komari-agent"
-            ;;
-        *)
-            echo ""
-            ;;
-    esac
-}
-
-# Function to validate agent type
-validate_agent() {
-    local agent="$1"
-    case "$agent" in
-        nezha|komari)
-            return 0
-            ;;
-        *)
-            print_error "Invalid agent: $agent"
-            print_info "Supported agents: nezha, komari"
-            exit 1
             ;;
     esac
 }
@@ -162,10 +109,8 @@ show_usage() {
     echo "Available architectures:"
     echo "  arm64      - ARM 64-bit → arm64-v8a (recommended for Android)"
     echo "  arm        - ARM 32-bit → armeabi-v7a"
-    echo "  amd64      - x86 64-bit → x86_64"
-    echo "  386        - x86 32-bit → x86"
     echo ""
-    echo "Note: Other architectures (mips, mipsle, riscv64, s390x) are not supported for Android JNI"
+    echo "Note: Other architectures (amd64, 386, mips, riscv64, etc.) are not supported for Android JNI"
     echo ""
     echo "Special commands:"
     echo "  --version [agent] [arch]  - Show current binary version (default: nezha arm64)"
@@ -175,14 +120,13 @@ show_usage() {
     echo "  $0 nezha arm64                    # Download Nezha Agent ARM64 binary"
     echo "  $0 komari arm64                   # Download Komari Agent ARM64 binary"
     echo "  $0 nezha arm                      # Download Nezha Agent ARM32 binary"
+    echo "  $0 komari arm                     # Download Komari Agent ARM32 binary"
     echo "  $0 --version nezha arm64          # Check Nezha Agent ARM64 binary version"
-    echo "  $0 --version komari               # Check Komari Agent (default ARM64) binary version"
+    echo "  $0 --version komari arm64         # Check Komari Agent ARM64 binary version"
     echo ""
     echo "Output locations:"
     echo "  arm64 → app/src/main/jniLibs/arm64-v8a/lib{agent-name}.so"
     echo "  arm   → app/src/main/jniLibs/armeabi-v7a/lib{agent-name}.so"
-    echo "  amd64 → app/src/main/jniLibs/x86_64/lib{agent-name}.so"
-    echo "  386   → app/src/main/jniLibs/x86/lib{agent-name}.so"
     echo ""
 }
 
@@ -190,12 +134,17 @@ show_usage() {
 validate_architecture() {
     local arch="$1"
     case "$arch" in
-        arm64|arm|amd64|386)
+        arm64|arm)
             return 0
+            ;;
+        amd64|386)
+            print_error "Architecture '$arch' (x86) is no longer supported"
+            print_info "Supported architectures: arm64, arm"
+            exit 1
             ;;
         mips|mipsle|riscv64|s390x)
             print_error "Architecture '$arch' is not supported for Android JNI"
-            print_info "Supported architectures: arm64, arm, amd64, 386"
+            print_info "Supported architectures: arm64, arm"
             exit 1
             ;;
         *)
@@ -265,7 +214,7 @@ show_current_version() {
         print_info "Available binaries:"
         for check_agent in nezha komari; do
             local check_binary_name=$(get_agent_binary_name "$check_agent")
-            for check_arch in arm64 arm amd64 386; do
+            for check_arch in arm64 arm; do
                 local check_dir=$(get_jni_lib_dir "$check_arch")
                 local check_path="$check_dir/lib${check_binary_name}.so"
                 if [ -f "$check_path" ]; then
@@ -312,7 +261,7 @@ find_download_url() {
     local release_data="$1"
     local agent="$2"
     local arch="$3"
-    local os="linux"  # We're targeting Linux binaries for Android
+    local os="linux"  # Default OS for Nezha agent
     
     local binary_name=$(get_agent_binary_name "$agent")
     local asset_name
@@ -325,7 +274,8 @@ find_download_url() {
             asset_name="${binary_name}_${os}_${arch}.zip"
             ;;
         komari)
-            # Komari uses raw binary format: komari-agent-linux-arm64
+            # Komari uses android binaries: komari-agent-android-arm64
+            os="android"
             asset_name="${binary_name}-${os}-${arch}"
             ;;
     esac
@@ -357,7 +307,7 @@ download_and_extract() {
     # Validate architecture is supported
     if [ "$jni_dir" = "app/src/main/jniLibs/unsupported" ]; then
         print_error "Architecture '$arch' is not supported for Android JNI"
-        print_info "Supported architectures: arm64 (arm64-v8a), arm (armeabi-v7a), amd64 (x86_64), 386 (x86)"
+        print_info "Supported architectures: arm64 (arm64-v8a), arm (armeabi-v7a)"
         exit 1
     fi
     

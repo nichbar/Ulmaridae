@@ -47,20 +47,12 @@ jobs:
                   ./download-agent.sh nezha arm64
                   echo "Downloading ARM32 binary..."
                   ./download-agent.sh nezha arm
-                  echo "Downloading X86_64 binary..."
-                  ./download-agent.sh nezha amd64
-                  echo "Downloading X86 binary..."
-                  ./download-agent.sh nezha 386
 
                   echo "Downloading Komari Agent binaries..."
                   echo "Downloading ARM64 binary..."
                   ./download-agent.sh komari arm64
                   echo "Downloading ARM32 binary..."
                   ./download-agent.sh komari arm
-                  echo "Downloading X86_64 binary..."
-                  ./download-agent.sh komari amd64
-                  echo "Downloading X86 binary..."
-                  ./download-agent.sh komari 386
 
             - name: Build release APKs (if signed)
               env:
@@ -133,11 +125,9 @@ jobs:
                   5. Toggle the \"Enable Agent\" switch to start monitoring
 
                   ### APK Variants
-                  - universal - Contains all architectures, suitable for most devices
+                  - universal - Contains all supported architectures, suitable for most devices
                   - arm64-v8a - Recommended for modern devices
-                  - armeabi-v7a - For older devices  
-                  - x86_64 - For 64-bit x86 devices
-                  - x86 - For 32-bit x86 devices
+                  - armeabi-v7a - For older devices
 
                   ### Requirements
                   - Android 7.0 (API level 24) or higher

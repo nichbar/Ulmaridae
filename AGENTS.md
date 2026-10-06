@@ -2,7 +2,7 @@
 
 ## Build And Test
 
-- Download agent binaries: `./download-agent.sh <nezha|komari> <arm64|arm|amd64|386>`
+- Download agent binaries: `./download-agent.sh <nezha|komari> <arm64|arm>`
 - Verify binary versions: `./download-agent.sh --version [agent] [arch]`
 - Compile Kotlin / Typecheck: `./gradlew compileDebugKotlin`
 - Unit tests: `./gradlew testDebugUnitTest`
