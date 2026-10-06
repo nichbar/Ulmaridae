@@ -30,6 +30,7 @@ import now.link.agent.AgentType
 import now.link.agent.KomariAgentConfiguration
 import now.link.agent.NezhaAgentConfiguration
 import now.link.ui.components.AgentSelectionDialog
+import now.link.ui.components.LoggingDisabledDialog
 import now.link.ui.components.UnifiedConfigurationDialog
 import now.link.ui.components.UpdateDialog
 import now.link.ui.components.WakeLockInfoDialog
@@ -163,7 +164,7 @@ fun MainScreen(
 
         // Actions Card
         ActionsCard(
-            onLogsClick = onLogsClick,
+            onLogsClick = { viewModel.onViewLogsClick(onLogsClick) },
             onCheckUpdateClick = { viewModel.checkForUpdatesManually() },
             isCheckingUpdate = uiState.isCheckingUpdate
         )
@@ -248,6 +249,22 @@ fun MainScreen(
             onUpdate = { viewModel.onUpdateDialogUpdate() },
             onIgnore = { viewModel.onUpdateDialogIgnore() },
             onDismiss = { viewModel.dismissUpdateDialog() }
+        )
+    }
+
+    // Logging Disabled Dialog
+    if (uiState.showLoggingDisabledDialog) {
+        LoggingDisabledDialog(
+            onEnableAndNavigate = {
+                viewModel.updateLoggingEnabled(true)
+                viewModel.dismissLoggingDisabledDialog()
+                onLogsClick()
+            },
+            onNavigateAnyway = {
+                viewModel.dismissLoggingDisabledDialog()
+                onLogsClick()
+            },
+            onDismiss = { viewModel.dismissLoggingDisabledDialog() }
         )
     }
 }

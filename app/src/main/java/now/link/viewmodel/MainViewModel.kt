@@ -76,6 +76,7 @@ data class MainScreenUiState(
     val showConfigurationDialog: Boolean = false,
     val showWakeLockDialog: Boolean = false,
     val showAgentSelectionDialog: Boolean = false,
+    val showLoggingDisabledDialog: Boolean = false,
 
     // Update-related states
     val updateInfo: UpdateInfo? = null,
@@ -362,6 +363,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun dismissWakeLockDialog() {
         _uiState.update { it.copy(showWakeLockDialog = false) }
+    }
+
+    fun showLoggingDisabledDialog() {
+        _uiState.update { it.copy(showLoggingDisabledDialog = true) }
+    }
+
+    fun dismissLoggingDisabledDialog() {
+        _uiState.update { it.copy(showLoggingDisabledDialog = false) }
+    }
+
+    fun onViewLogsClick(onNavigate: () -> Unit) {
+        if (_uiState.value.isLoggingEnabled) {
+            onNavigate()
+        } else {
+            showLoggingDisabledDialog()
+        }
     }
 
     // Agent selection methods

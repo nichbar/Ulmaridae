@@ -134,6 +134,10 @@
     <!-- Logs Activity -->
     <string name="no_logs_yet">尚无日志记录</string>
     <string name="logging_disabled">内存日志已禁用。\n在设置中启用以捕获日志。</string>
+    <string name="logging_disabled_dialog_title">内存日志已禁用</string>
+    <string name="logging_disabled_dialog_message">当前内存日志已禁用，开启后才会记录新的日志。</string>
+    <string name="enable_and_view">启用并查看</string>
+    <string name="view_anyway">仍然查看</string>
     <string name="logs_cleared">日志已清除</string>
     <string name="logs_copied_to_clipboard">已复制 %d 条日志到剪贴板</string>
     <string name="no_logs_to_copy">没有日志可复制</string>

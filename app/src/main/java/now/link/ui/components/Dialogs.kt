@@ -328,3 +328,33 @@ fun WakeLockInfoDialog(
         }
     )
 }
+
+@Composable
+fun LoggingDisabledDialog(
+    onEnableAndNavigate: () -> Unit,
+    onNavigateAnyway: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(stringResource(id = R.string.logging_disabled_dialog_title))
+        },
+        text = {
+            Text(stringResource(id = R.string.logging_disabled_dialog_message))
+        },
+        confirmButton = {
+            TextButton(onClick = onEnableAndNavigate) {
+                Text(stringResource(id = R.string.enable_and_view))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(id = R.string.cancel))
+            }
+            TextButton(onClick = onNavigateAnyway) {
+                Text(stringResource(id = R.string.view_anyway))
+            }
+        }
+    )
+}
