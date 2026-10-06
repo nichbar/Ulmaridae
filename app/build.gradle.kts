@@ -15,8 +15,8 @@ android {
         applicationId = "now.link.ulmaridae"
         minSdk = 24
         targetSdk = 36
-        versionCode = 800
-        versionName = "0.8"
+        versionCode = 801
+        versionName = "0.8.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
